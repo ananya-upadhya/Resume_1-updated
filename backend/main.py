@@ -1,0 +1,444 @@
+"""
+ResumeBuilder Backend — NO API KEY NEEDED
+Only does: PDF export + DOCX export
+Run: uvicorn main:app --reload --port 5000
+"""
+
+import io
+import os
+import uuid
+import tempfile
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+from typing import List
+
+from resume_docx import build_docx
+from resume_pdf  import build_pdf
+
+app = FastAPI(title="ResumeBuilder Backend", version="1.0.0")
+app.add_middleware(CORSMiddleware, allow_origins=["*"],
+                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+
+# ── Models ────────────────────────────────────────────────────────────────────
+
+class Personal(BaseModel):
+    name:str=""; title:str=""; email:str=""; phone:str=""
+    location:str=""; linkedin:str=""; github:str=""; website:str=""
+
+class Summary(BaseModel):
+    text:str=""
+
+class Experience(BaseModel):
+    id:str=""; company:str=""; role:str=""
+    start:str=""; end:str=""; current:bool=False; bullets:str=""
+
+class Education(BaseModel):
+    id:str=""; institution:str=""; degree:str=""
+    field:str=""; start:str=""; end:str=""; gpa:str=""
+
+class Project(BaseModel):
+    id:str=""; name:str=""; tech:str=""; url:str=""; bullets:str=""
+
+class Certification(BaseModel):
+    id:str=""; name:str=""; issuer:str=""; date:str=""
+
+class ResumeData(BaseModel):
+    personal:Personal=Personal()
+    summary:Summary=Summary()
+    experience:List[Experience]=[]
+    education:List[Education]=[]
+    skills:List[str]=[]
+    projects:List[Project]=[]
+    certifications:List[Certification]=[]
+    templateId: str = "classic" 
+
+
+# ── Endpoints ─────────────────────────────────────────────────────────────────
+
+@app.get("/")
+def root():
+    return {"status": "ResumeBuilder backend is running", "version": "1.0.0"}
+
+@app.post("/api/export/pdf")
+async def export_pdf(data: ResumeData):
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, HRFlowable
+    from reportlab.lib.units import mm
+
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4,
+                            leftMargin=18*mm, rightMargin=18*mm,
+                            topMargin=16*mm, bottomMargin=16*mm)
+
+    styles = getSampleStyleSheet()
+    story  = []
+    tid    = data.templateId
+
+    def fmt_date(s):
+        if not s: return ""
+        try:
+            from datetime import datetime
+            return datetime.strptime(s, "%d-%m-%Y").strftime("%d %b %Y")
+        except:
+            return s
+
+    p = data.personal
+
+    # ── COLOUR PALETTE per template ──
+    PALETTES = {
+        "classic":   {"accent": colors.HexColor("#0a0a0a"), "sub": colors.HexColor("#555555"), "bullet": "–"},
+        "modern":    {"accent": colors.HexColor("#2563eb"), "sub": colors.HexColor("#475569"), "bullet": "▸"},
+        "tech":      {"accent": colors.HexColor("#16a34a"), "sub": colors.HexColor("#334155"), "bullet": "→"},
+        "executive": {"accent": colors.HexColor("#1e3a5f"), "sub": colors.HexColor("#b8860b"), "bullet": "◆"},
+        "etherx":    {"accent": colors.HexColor("#A07830"), "sub": colors.HexColor("#C9A84C"), "bullet": "◆"},
+    }
+    pal = PALETTES.get(tid, PALETTES["classic"])
+
+    def style(name, **kw):
+        return ParagraphStyle(name, parent=styles["Normal"], **kw)
+
+    # Styles
+    name_align  = 1 if tid in ("classic",) else 0
+    name_s      = style("Name",    fontSize=22, fontName="Helvetica-Bold",
+                        alignment=name_align, spaceAfter=2,
+                        textColor=colors.HexColor("#0a0a0a"))
+    title_s     = style("Title",   fontSize=10, alignment=name_align,
+                        spaceAfter=3, textColor=pal["sub"])
+    contact_s   = style("Contact", fontSize=8,  alignment=name_align,
+                        spaceAfter=10, textColor=colors.HexColor("#555555"))
+    sec_s       = style("Sec",     fontSize=10, fontName="Helvetica-Bold",
+                        spaceBefore=10, spaceAfter=3, textColor=pal["accent"])
+    body_s      = style("Body",    fontSize=9,  spaceAfter=2, leading=13,
+                        textColor=colors.HexColor("#1a1a1a"))
+    sub_s       = style("Sub",     fontSize=8,  spaceAfter=2,
+                        textColor=pal["sub"])
+    bullet_s    = style("Bullet",  fontSize=9,  leftIndent=12,
+                        spaceAfter=2, leading=13,
+                        textColor=colors.HexColor("#1a1a1a"))
+
+    # ── HEADER ──
+    story.append(Paragraph(p.name or "Your Name", name_s))
+    if p.title:
+        story.append(Paragraph(p.title, title_s))
+    contacts = "  |  ".join(filter(None, [
+        p.email, p.phone, p.location, p.linkedin, p.github, p.website
+    ]))
+    if contacts:
+        story.append(Paragraph(contacts, contact_s))
+
+    # Divider line in accent color
+    story.append(HRFlowable(width="100%", thickness=1.5,
+                             color=pal["accent"]))
+    story.append(Spacer(1, 4))
+
+    def section(title):
+        story.append(Spacer(1, 6))
+        story.append(Paragraph(title, sec_s))
+        story.append(HRFlowable(width="100%", thickness=0.5,
+                                 color=pal["sub"]))
+        story.append(Spacer(1, 3))
+
+    def bullets(text):
+        if not text: return
+        for b in text.split("\n"):
+            b = b.strip().lstrip("-•▸◆→*").strip()
+            if b:
+                story.append(Paragraph(
+                    f'<font color="#{pal["accent"].hexval()[2:]}">{pal["bullet"]}</font>  {b}',
+                    bullet_s
+                ))
+
+    # ── SUMMARY ──
+    if data.summary.text:
+        section("Professional Summary")
+        story.append(Paragraph(data.summary.text, body_s))
+
+    # ── EXPERIENCE ──
+    if data.experience:
+        section("Work Experience")
+        for e in data.experience:
+            date_str = f"{fmt_date(e.start)} – {'Present' if e.current else fmt_date(e.end)}"
+            story.append(Paragraph(
+                f'<b>{e.role}</b>  <font color="#{pal["sub"].hexval()[2:]}">{e.company}</font>'
+                f'  <font size="8" color="#888888">({date_str})</font>',
+                body_s
+            ))
+            bullets(e.bullets)
+            story.append(Spacer(1, 4))
+
+    # ── PROJECTS ──
+    if data.projects:
+        section("Projects")
+        for pr in data.projects:
+            story.append(Paragraph(
+                f'<b>{pr.name}</b>  <font color="#{pal["sub"].hexval()[2:]}" size="8">{pr.tech}</font>',
+                body_s
+            ))
+            bullets(pr.bullets)
+            story.append(Spacer(1, 4))
+
+    # ── EDUCATION ──
+    if data.education:
+        section("Education")
+        for e in data.education:
+            deg = " in ".join(filter(None, [e.degree, e.field]))
+            date_str = f"{e.start}{' – ' if e.start and e.end else ''}{e.end}"
+            story.append(Paragraph(
+                f'<b>{deg}</b>  <font color="#{pal["sub"].hexval()[2:]}">{e.institution}</font>'
+                f'  <font size="8" color="#888888">({date_str})</font>',
+                body_s
+            ))
+            if e.gpa:
+                story.append(Paragraph(f"CGPA / Score: {e.gpa}", sub_s))
+            story.append(Spacer(1, 4))
+
+    # ── SKILLS ──
+    if data.skills:
+        section("Skills")
+        story.append(Paragraph(
+            "  •  ".join(data.skills), body_s
+        ))
+
+    # ── CERTIFICATIONS ──
+    if data.certifications:
+        section("Certifications")
+        for c in data.certifications:
+            story.append(Paragraph(
+                f'<b>{c.name}</b>  <font color="#{pal["sub"].hexval()[2:]}">{c.issuer}</font>'
+                f'  <font size="8" color="#888888">{fmt_date(c.date)}</font>',
+                body_s
+            ))
+            story.append(Spacer(1, 3))
+
+    doc.build(story)
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer, media_type="application/pdf",
+        headers={"Content-Disposition":
+                 f'attachment; filename="{p.name or "resume"}_{tid}_resume.pdf"'}
+    )
+
+@app.post("/api/export/docx")
+async def export_docx(data: ResumeData):
+    from docx import Document
+    from docx.shared import Pt, RGBColor, Inches
+    from docx.enum.text import WD_ALIGN_PARAGRAPH
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+
+    buffer = io.BytesIO()
+    doc    = Document()
+    tid    = data.templateId
+
+    # ── Page margins ──
+    for section in doc.sections:
+        section.top_margin    = Inches(0.6)
+        section.bottom_margin = Inches(0.6)
+        section.left_margin   = Inches(0.75)
+        section.right_margin  = Inches(0.75)
+
+    # ── Colour palettes per template ──
+    PALETTES = {
+        "classic":   {"accent": (10,10,10),      "sub": (85,85,85),    "bullet": "–",  "center": True},
+        "modern":    {"accent": (37,99,235),     "sub": (71,85,105),   "bullet": "▸",  "center": False},
+        "tech":      {"accent": (22,163,74),     "sub": (51,65,85),    "bullet": "→",  "center": False},
+        "executive": {"accent": (30,58,95),      "sub": (184,134,11),  "bullet": "◆",  "center": False},
+        "etherx":    {"accent": (160,120,48),    "sub": (201,168,76),  "bullet": "◆",  "center": False},
+    }
+    pal = PALETTES.get(tid, PALETTES["classic"])
+
+    def rgb(t): return RGBColor(t[0], t[1], t[2])
+
+    def fmt_date(s):
+        if not s: return ""
+        try:
+            from datetime import datetime
+            return datetime.strptime(s, "%d-%m-%Y").strftime("%d %b %Y")
+        except:
+            return s
+
+    def add_hr(color_tuple=(180,180,180)):
+        """Add a horizontal rule paragraph"""
+        p   = doc.add_paragraph()
+        pPr = p._p.get_or_add_pPr()
+        pBdr= OxmlElement("w:pBdr")
+        bot = OxmlElement("w:bottom")
+        bot.set(qn("w:val"),   "single")
+        bot.set(qn("w:sz"),    "6")
+        bot.set(qn("w:space"), "1")
+        bot.set(qn("w:color"),
+                "{:02X}{:02X}{:02X}".format(*color_tuple))
+        pBdr.append(bot)
+        pPr.append(pBdr)
+        p.paragraph_format.space_before = Pt(0)
+        p.paragraph_format.space_after  = Pt(2)
+        return p
+
+    def add_section_heading(title):
+        p   = doc.add_paragraph()
+        run = p.add_run(title.upper())
+        run.bold           = True
+        run.font.size      = Pt(10)
+        run.font.color.rgb = rgb(pal["accent"])
+        p.paragraph_format.space_before = Pt(10)
+        p.paragraph_format.space_after  = Pt(2)
+        add_hr(pal["sub"])
+
+    def add_bullet(text):
+        text = text.strip().lstrip("-•▸◆→*").strip()
+        if not text: return
+        p   = doc.add_paragraph()
+        bul = p.add_run(f'{pal["bullet"]}  ')
+        bul.font.color.rgb = rgb(pal["accent"])
+        bul.font.size      = Pt(9)
+        run = p.add_run(text)
+        run.font.size      = Pt(9)
+        p.paragraph_format.left_indent  = Inches(0.15)
+        p.paragraph_format.space_after  = Pt(1)
+
+    def add_bullets(bullets_text):
+        if not bullets_text: return
+        for b in bullets_text.split("\n"):
+            b = b.strip()
+            if b: add_bullet(b)
+
+    p = data.personal
+
+    # ── NAME ──
+    name_p = doc.add_paragraph()
+    name_p.alignment = WD_ALIGN_PARAGRAPH.CENTER if pal["center"] else WD_ALIGN_PARAGRAPH.LEFT
+    name_r = name_p.add_run(p.name or "Your Name")
+    name_r.bold            = True
+    name_r.font.size       = Pt(22)
+    name_r.font.color.rgb  = RGBColor(10,10,10)
+    name_p.paragraph_format.space_after = Pt(2)
+
+    # ── TITLE ──
+    if p.title:
+        tp = doc.add_paragraph()
+        tp.alignment = WD_ALIGN_PARAGRAPH.CENTER if pal["center"] else WD_ALIGN_PARAGRAPH.LEFT
+        tr = tp.add_run(p.title)
+        tr.font.size      = Pt(10)
+        tr.font.color.rgb = rgb(pal["sub"])
+        tp.paragraph_format.space_after = Pt(2)
+
+    # ── CONTACTS ──
+    contacts = "  |  ".join(filter(None, [
+        p.email, p.phone, p.location, p.linkedin, p.github, p.website
+    ]))
+    if contacts:
+        cp = doc.add_paragraph()
+        cp.alignment = WD_ALIGN_PARAGRAPH.CENTER if pal["center"] else WD_ALIGN_PARAGRAPH.LEFT
+        cr = cp.add_run(contacts)
+        cr.font.size      = Pt(8)
+        cr.font.color.rgb = RGBColor(85,85,85)
+        cp.paragraph_format.space_after = Pt(4)
+
+    # Accent HR under header
+    add_hr(pal["accent"])
+
+    # ── SUMMARY ──
+    if data.summary.text:
+        add_section_heading("Professional Summary")
+        sp = doc.add_paragraph()
+        sr = sp.add_run(data.summary.text)
+        sr.font.size = Pt(9)
+        sp.paragraph_format.space_after = Pt(4)
+
+    # ── EXPERIENCE ──
+    if data.experience:
+        add_section_heading("Work Experience")
+        for e in data.experience:
+            ep  = doc.add_paragraph()
+            r1  = ep.add_run(e.role or "Role")
+            r1.bold = True; r1.font.size = Pt(10)
+            r2  = ep.add_run(f"  —  {e.company}")
+            r2.font.size      = Pt(10)
+            r2.font.color.rgb = rgb(pal["sub"])
+            date_str = f"{fmt_date(e.start)} – {'Present' if e.current else fmt_date(e.end)}"
+            r3  = ep.add_run(f"  ({date_str})")
+            r3.font.size      = Pt(8)
+            r3.font.color.rgb = RGBColor(136,136,136)
+            ep.paragraph_format.space_before = Pt(6)
+            ep.paragraph_format.space_after  = Pt(2)
+            add_bullets(e.bullets)
+
+    # ── PROJECTS ──
+    if data.projects:
+        add_section_heading("Projects")
+        for pr in data.projects:
+            pp2 = doc.add_paragraph()
+            r1  = pp2.add_run(pr.name or "Project")
+            r1.bold = True; r1.font.size = Pt(10)
+            if pr.tech:
+                r2 = pp2.add_run(f"  |  {pr.tech}")
+                r2.font.size      = Pt(9)
+                r2.font.color.rgb = rgb(pal["sub"])
+            pp2.paragraph_format.space_before = Pt(6)
+            pp2.paragraph_format.space_after  = Pt(2)
+            add_bullets(pr.bullets)
+
+    # ── EDUCATION ──
+    if data.education:
+        add_section_heading("Education")
+        for e in data.education:
+            deg  = " in ".join(filter(None, [e.degree, e.field]))
+            date_str = f"{e.start}{' – ' if e.start and e.end else ''}{e.end}"
+            ep   = doc.add_paragraph()
+            r1   = ep.add_run(deg or "Degree")
+            r1.bold = True; r1.font.size = Pt(10)
+            r2   = ep.add_run(f"  —  {e.institution}")
+            r2.font.size      = Pt(10)
+            r2.font.color.rgb = rgb(pal["sub"])
+            r3   = ep.add_run(f"  ({date_str})")
+            r3.font.size      = Pt(8)
+            r3.font.color.rgb = RGBColor(136,136,136)
+            ep.paragraph_format.space_before = Pt(6)
+            ep.paragraph_format.space_after  = Pt(2)
+            if e.gpa:
+                gp  = doc.add_paragraph()
+                gr  = gp.add_run(f"CGPA / Score: {e.gpa}")
+                gr.font.size      = Pt(9)
+                gr.font.color.rgb = rgb(pal["sub"])
+                gp.paragraph_format.space_after = Pt(2)
+
+    # ── SKILLS ──
+    if data.skills:
+        add_section_heading("Skills")
+        skp = doc.add_paragraph()
+        skr = skp.add_run("  •  ".join(data.skills))
+        skr.font.size = Pt(9)
+        skp.paragraph_format.space_after = Pt(4)
+
+    # ── CERTIFICATIONS ──
+    if data.certifications:
+        add_section_heading("Certifications")
+        for c in data.certifications:
+            cp2 = doc.add_paragraph()
+            r1  = cp2.add_run(c.name)
+            r1.bold = True; r1.font.size = Pt(10)
+            if c.issuer:
+                r2 = cp2.add_run(f"  —  {c.issuer}")
+                r2.font.size      = Pt(9)
+                r2.font.color.rgb = rgb(pal["sub"])
+            if c.date:
+                r3 = cp2.add_run(f"  {fmt_date(c.date)}")
+                r3.font.size      = Pt(8)
+                r3.font.color.rgb = RGBColor(136,136,136)
+            cp2.paragraph_format.space_before = Pt(4)
+            cp2.paragraph_format.space_after  = Pt(2)
+
+    doc.save(buffer)
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition":
+                 f'attachment; filename="{p.name or "resume"}_{tid}_resume.docx"'}
+    )
+
+# uvicorn main:app --reload --port 5000
