@@ -49,3 +49,4 @@ Desktop.ini
 
 # ── Deployment Specific ──
 .vercel
+echo .env >> .gitignore
