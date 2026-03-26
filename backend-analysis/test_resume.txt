@@ -1,0 +1,29 @@
+John Doe
+Senior Software Engineer
+New York, NY | john.doe@email.com
+
+SUMMARY
+Experienced software engineer with a focus on web development, scalable backends, and cloud infrastructure.
+
+SKILLS
+Python, JavaScript, React, Node.js, AWS, Docker, SQL, Kubernetes
+
+EXPERIENCE
+Tech Corp Inc.
+Senior Backend Engineer
+2020 - Present
+- Built microservices using Python and FastAPI
+- Deployed applications to Kubernetes on AWS
+- Improved database query performance by 40%
+
+Web Solutions LLC
+Frontend Developer
+2018 - 2020
+- Developed responsive SPAs using React
+- Implemented state management with Redux
+- Collaborated with UX designers to improve accessibility
+
+EDUCATION
+Bachelor of Science in Computer Science
+State University
+2014 - 2018

@@ -1,16 +1,14 @@
 import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const STYLES = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=Crimson+Pro:ital,wght@0,300;0,400;1,400&display=swap');
-
-  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-  html, body, #root { height:auto !important; overflow:auto !important; }
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   .lp {
     min-height:100vh; width:100%;
     background:#080808;
     color:#E8C96B;
-    font-family:'DM Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     display:flex; flex-direction:column;
     overflow-x:hidden;
   }
@@ -32,11 +30,9 @@ const STYLES = `
     background:rgba(8,8,8,0.8);
     backdrop-filter:blur(12px);
   }
-  .lp-brand {
-    display:flex; align-items:center; gap:.75rem;
-  }
+  .lp-brand { display:flex; align-items:center; gap:.75rem; }
   .lp-logo-text {
-    font-family:'Cinzel',serif; font-size:1.2rem; font-weight:700;
+    font-family:'Inter',sans-serif; font-size:1.2rem; font-weight:700;
     letter-spacing:.1em;
     background:linear-gradient(90deg,#A07830,#F0C040,#C9A84C);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent;
@@ -76,7 +72,7 @@ const STYLES = `
     animation: blink 2s ease infinite;
   }
   .lp-headline {
-    font-family:'Cinzel',serif;
+    font-family:'Inter',sans-serif;
     font-size:clamp(2rem, 5vw, 3.5rem);
     font-weight:700; letter-spacing:.05em; line-height:1.15;
     background:linear-gradient(135deg,#F0C040 0%,#C9A84C 40%,#A07830 100%);
@@ -85,7 +81,7 @@ const STYLES = `
     animation: fadeIn .7s ease .1s both;
   }
   .lp-sub {
-    font-family:'Crimson Pro',serif;
+    font-family:'Inter',sans-serif;
     font-size:clamp(1rem,2vw,1.25rem);
     color:#C8B090; font-style:italic;
     max-width:540px; line-height:1.7;
@@ -98,7 +94,7 @@ const STYLES = `
   }
   .lp-stat { text-align:center; }
   .lp-stat-val {
-    font-family:'Cinzel',serif; font-size:1.6rem; font-weight:700;
+    font-family:'Inter',sans-serif; font-size:1.6rem; font-weight:700;
     background:linear-gradient(135deg,#F0C040,#C9A84C);
     -webkit-background-clip:text; -webkit-text-fill-color:transparent;
     background-clip:text;
@@ -117,17 +113,32 @@ const STYLES = `
     padding:.85rem 2.2rem;
     background:linear-gradient(135deg,#A07830,#C9A84C,#F0C040);
     border:none; border-radius:10px;
-    font-family:'Cinzel',serif; font-size:.92rem;
+    font-family:'Inter',sans-serif; font-size:.92rem;
     font-weight:700; letter-spacing:.08em;
     color:#080808; cursor:pointer;
     transition:all .2s ease;
     box-shadow:0 4px 24px rgba(201,168,76,0.3);
+    min-width: 260px; justify-content: center;
   }
   .lp-cta:hover {
     transform:translateY(-2px);
     box-shadow:0 8px 32px rgba(201,168,76,0.45);
   }
   .lp-cta:active { transform:translateY(0); }
+
+  .lp-cta-outline {
+    background: transparent;
+    border: 1.5px solid rgba(201,168,76,0.55);
+    color: #C9A84C;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.12);
+  }
+  .lp-cta-outline:hover {
+    background: rgba(201,168,76,0.08);
+    border-color: rgba(201,168,76,0.85);
+    box-shadow: 0 8px 28px rgba(201,168,76,0.25);
+    color: #F0C040;
+  }
+
   .lp-cta-hint {
     font-size:.65rem; color:#6B5A3A; letter-spacing:.08em;
   }
@@ -155,13 +166,13 @@ const STYLES = `
   }
 
   .lp-features {
-  position:relative; z-index:1;
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:1px; background:rgba(201,168,76,0.1);
-  border-top:1px solid rgba(201,168,76,0.1);
-  animation: fadeIn .8s ease .5s both;
-  flex-shrink:0;
-}
+    position:relative; z-index:1;
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1px; background:rgba(201,168,76,0.1);
+    border-top:1px solid rgba(201,168,76,0.1);
+    animation: fadeIn .8s ease .5s both;
+    flex-shrink:0;
+  }
   .lp-feat {
     background:#080808; padding:1.6rem 1.8rem;
     display:flex; flex-direction:column; gap:.5rem;
@@ -170,12 +181,10 @@ const STYLES = `
   .lp-feat:hover { background:#0e0e0e; }
   .lp-feat-ico { font-size:1.4rem; }
   .lp-feat-title {
-    font-family:'Cinzel',serif; font-size:.72rem;
+    font-family:'Inter',sans-serif; font-size:.72rem;
     font-weight:600; letter-spacing:.08em; color:#C9A84C;
   }
-  .lp-feat-desc {
-    font-size:.7rem; color:#6B5A3A; line-height:1.6;
-  }
+  .lp-feat-desc { font-size:.7rem; color:#6B5A3A; line-height:1.6; }
 
   @keyframes fadeIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes blink   { 0%,100%{opacity:1} 50%{opacity:.3} }
@@ -194,7 +203,8 @@ const FEATURES = [
   { ico: "📄", title: "PDF & Word Export", desc: "Download in both formats with one click." },
 ];
 
-export default function LandingPage({ onStart }) {
+export default function LandingPage() {
+  const navigate = useNavigate();
   const [show, setShow] = useState(false);
   const featRef = useRef(null);
   useEffect(() => { setTimeout(() => setShow(true), 80); }, []);
@@ -219,23 +229,23 @@ export default function LandingPage({ onStart }) {
                 <div className="lp-logo-sub">Smart Resume Intelligence</div>
               </div>
             </div>
-            <div className="lp-nav-badge">Module 1 — Resume Builder</div>
+            <div className="lp-nav-badge">Module 1 — Resume Suite</div>
           </nav>
 
           {/* Hero */}
           <div className="lp-hero">
             <div className="lp-module-tag">
               <span className="lp-module-dot" />
-              ATS-Optimised · Role-Ready
+              ATS-Optimised · Role-Ready · AI-Powered
             </div>
 
             <h1 className="lp-headline">
-              Build Resumes That<br />Get Shortlisted
+              Build & Analyze Resumes<br />That Get Shortlisted
             </h1>
 
             <p className="lp-sub">
-              A professional resume builder with live ATS scoring,
-              keyword gap analysis, and one-click PDF &amp; Word export.
+              A professional resume suite with live ATS scoring,
+              AI-powered analysis, and one-click PDF &amp; Word export.
             </p>
 
             {/* Stats */}
@@ -243,7 +253,7 @@ export default function LandingPage({ onStart }) {
               {[
                 { v: "7", l: "Form Sections" },
                 { v: "14+", l: "ATS Checks" },
-                { v: "100", l: "Max ATS Score" },
+                { v: "AI", l: "Resume Analysis" },
                 { v: "2", l: "Export Formats" },
               ].map(s => (
                 <div className="lp-stat" key={s.l}>
@@ -253,10 +263,13 @@ export default function LandingPage({ onStart }) {
               ))}
             </div>
 
-            {/* CTA */}
+            {/* CTA Buttons */}
             <div className="lp-cta-wrap">
-              <button className="lp-cta" onClick={onStart}>
+              <button className="lp-cta" onClick={() => navigate('/build')}>
                 Start Building My Resume →
+              </button>
+              <button className="lp-cta lp-cta-outline" onClick={() => navigate('/analyze')}>
+                Analyze My Resume →
               </button>
               <div className="lp-cta-hint">
                 No sign-up · No API keys · 100% free

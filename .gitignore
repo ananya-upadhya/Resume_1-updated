@@ -1,0 +1,51 @@
+# ── Frontend (Node.js/React/Vite) ──
+node_modules/
+/frontend/node_modules/
+
+# Build directories should be ignored so deployment platforms (Vercel/Netlify) can build them fresh
+dist/
+build/
+/frontend/dist/
+/frontend/build/
+
+# Do NOT ignore lockfiles (these are critical for deployment to install exact versions)
+!package-lock.json
+!yarn.lock
+!pnpm-lock.yaml
+
+# ── Backend (Python/FastAPI) ──
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments (Render/Railway will use their own, so we ignore local ones)
+venv/
+.venv/
+env/
+ENV/
+
+# ── Environment Variables & Secrets ──
+.env
+.env.*
+!.env.example
+
+# ── Logs & Debug ──
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ── OS Generated Files ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ── Editors & IDEs ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Deployment Specific ──
+.vercel

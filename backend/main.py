@@ -19,7 +19,7 @@ from resume_pdf  import build_pdf
 
 app = FastAPI(title="ResumeBuilder Backend", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
-                   allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+                   allow_credentials=False, allow_methods=["*"], allow_headers=["*"])
 
 # ── Models ────────────────────────────────────────────────────────────────────
 
