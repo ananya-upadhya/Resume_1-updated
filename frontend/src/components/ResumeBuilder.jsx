@@ -1465,8 +1465,8 @@ function ResumePreview({ data }) {
 }
 
 /* MAIN APP */
-export default function ResumeBuilder({ templateId = "classic" }) {
-  const [dark, setDark] = useState(false);
+export default function ResumeBuilder({ templateId = "classic", onBack }) {
+  const [dark, setDark] = useState(true);
   const [step, setStep] = useState(0);
   const [visited, setVisited] = useState(new Set([0]));
   const [data, setData] = useState(() => {
@@ -1578,6 +1578,34 @@ export default function ResumeBuilder({ templateId = "classic" }) {
         {/* HEADER */}
         <header className="rb-hdr">
           <button className="rb-hamburger" onClick={() => setSideOpen(o => !o)} aria-label="Menu">☰</button>
+          {onBack && (
+            <button
+              onClick={onBack}
+              title="Back to Templates"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                background: "transparent",
+                border: "1px solid rgba(201,168,76,0.35)",
+                color: "#C9A84C",
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: ".72rem",
+                fontWeight: 600,
+                letterSpacing: ".04em",
+                padding: ".28rem .75rem",
+                borderRadius: "7px",
+                cursor: "pointer",
+                marginRight: "6px",
+                transition: "all .15s",
+                whiteSpace: "nowrap",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(201,168,76,0.1)"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              ← Templates
+            </button>
+          )}
 
           <div className="rb-logomark"><LogoMark dark={dark} /></div>
 

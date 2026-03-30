@@ -125,12 +125,13 @@ const STYLES = `
   /* Card body */
   .ts-card-body { padding:.9rem 1.1rem 1rem; }
   .ts-card-name {
-    font-family:'Cinzel',serif; font-size:.82rem; font-weight:700;
-    color:#E8C96B; letter-spacing:.08em; margin-bottom:".2rem";
+    font-family:'DM Sans',sans-serif; font-size:.84rem; font-weight:500;
+    color:#E8C96B; letter-spacing:.03em; margin-bottom:".2rem";
   }
   .ts-card-desc {
+    font-family:'DM Sans',sans-serif;
     font-size:.68rem; color:rgba(201,168,76,0.5); line-height:1.55;
-    margin-top:.3rem;
+    margin-top:.3rem; font-weight:400;
   }
 
   /* Select button */
@@ -138,7 +139,7 @@ const STYLES = `
     width:100%; margin-top:.75rem;
     padding:.42rem; border-radius:7px;
     font-family:'DM Sans',sans-serif; font-size:.75rem;
-    font-weight:700; letter-spacing:.05em; cursor:pointer;
+    font-weight:500; letter-spacing:.03em; cursor:pointer;
     transition:all .15s; border:none;
   }
   .ts-select-btn.active {

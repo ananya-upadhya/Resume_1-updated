@@ -57,6 +57,7 @@ async def perform_full_analysis(
             "semantic_fit_score": semantic_result.get("semantic_fit_score", 0.0),
             "skills": resume_dict.get("skills", []),
             "missing_skills": missing_skills,
+            "required_skills": role_dict.get("required_skills", []),
             "semantic_matches": semantic_result.get("matches", []),
             "strengths": explanations.get("strengths", []),
             "weaknesses": explanations.get("weaknesses", []),

@@ -54,10 +54,36 @@ function ResultsDashboardContent({ data }) {
   }]
 
   const skillChartData = useMemo(() => {
-    const found = (data.skills || []).map(s => ({ name: s, value: 100, type: 'matched' }))
-    const missing = (data.missing_skills || []).map(s => ({ name: s, value: 50, type: 'missing' }))
+    // required_skills = skills the job domain NEEDS (from backend role intelligence)
+    // skills          = skills found on the resume
+    // missing_skills  = required by domain but NOT on resume
+    const required = new Set(
+      (data.required_skills || []).map(s => s.toLowerCase().trim())
+    )
+
+    // For found skills: high score if domain requires it, lower score if just on resume
+    const found = (data.skills || []).map((s, idx) => {
+      const isRequired = required.has(s.toLowerCase().trim())
+      // Domain-required skills: 75-100 range, staggered slightly so they don't all look identical
+      // Non-required (general) skills: 35-60 range
+      const base = isRequired ? 78 : 38
+      const offset = (idx % 5) * 4   // small offset 0/4/8/12/16 so bars vary
+      return {
+        name: s,
+        value: Math.min(100, base + offset),
+        type: isRequired ? 'matched_required' : 'matched_general',
+      }
+    })
+
+    // Missing skills: required by domain but not present → low scores (domain gap)
+    const missing = (data.missing_skills || []).map((s, idx) => ({
+      name: s,
+      value: Math.max(10, 28 - idx * 3),  // 28 → 10, stepping down by importance order
+      type: 'missing',
+    }))
+
     return [...found, ...missing].slice(0, 15)
-  }, [data.skills, data.missing_skills])
+  }, [data.skills, data.missing_skills, data.required_skills])
 
   return (
     <motion.div
@@ -114,23 +140,32 @@ function ResultsDashboardContent({ data }) {
             {skillChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={skillChartData} margin={{ top: 0, right: 0, left: -20, bottom: 20 }}>
-                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 11 }} interval={0} />
-                  <YAxis hide />
+                  <XAxis dataKey="name" angle={-45} textAnchor="end" height={60} tick={{ fontSize: 11, fill: 'rgba(201,168,76,0.7)' }} interval={0} />
+                  <YAxis domain={[0, 100]} tickFormatter={v => `${v}%`} tick={{ fontSize: 10, fill: 'rgba(201,168,76,0.5)' }} width={36} />
                   <Tooltip
                     cursor={{ fill: 'transparent' }}
                     content={({ payload }) => {
                       if (!payload?.length) return null
                       const v = payload[0].payload
+                      const label =
+                        v.type === 'matched_required' ? '✅ Domain Match — Required & Found'
+                        : v.type === 'matched_general' ? '📌 On Resume — Not in Domain'
+                        : '❌ Domain Gap — Required but Missing'
                       return (
                         <div className="bg-card text-foreground text-xs p-2 rounded shadow-md border border-border">
-                          <span className="font-bold">{v.name}</span>: {v.type === 'matched' ? 'Found in Resume' : 'Missing Requirement'}
+                          <span className="font-bold">{v.name}</span><br />{label}
                         </div>
                       )
                     }}
                   />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {skillChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.type === 'matched' ? 'var(--accent-gold)' : 'var(--error-red)'} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          entry.type === 'missing' ? 'var(--error-red)' : '#C9A84C'
+                        }
+                      />
                     ))}
                   </Bar>
                 </BarChart>

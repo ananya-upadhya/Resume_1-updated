@@ -16,5 +16,5 @@ export default function BuilderFlow() {
       />
     )
 
-  return <ResumeBuilder templateId={templateId} />
+  return <ResumeBuilder templateId={templateId} onBack={() => setScreen('template')} />
 }

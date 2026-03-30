@@ -42,8 +42,6 @@ export function Sidebar() {
           padding: '0 1.25rem',
           borderBottom: '1px solid var(--border-color)',
           background: 'transparent',
-          border: 'none',
-          borderBottom: '1px solid var(--border-color)',
           cursor: 'pointer',
           flexShrink: 0,
           textAlign: 'left',
