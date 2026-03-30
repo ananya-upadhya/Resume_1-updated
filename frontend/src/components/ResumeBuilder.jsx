@@ -1503,13 +1503,13 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
         if (!el) throw new Error("Resume preview not found.");
 
         const canvas = await html2canvas(el, {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
           backgroundColor: "#ffffff",
           logging: false,
         });
 
-        const imgData = canvas.toDataURL("image/png");
+        const imgData = canvas.toDataURL("image/jpeg", 0.82);
         const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
@@ -1519,7 +1519,7 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
         let y = 0;
         while (y < imgH) {
           if (y > 0) pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, -y, imgW, imgH);
+          pdf.addImage(imgData, "JPEG", 0, -y, imgW, imgH);
           y += pageH;
         }
 
