@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class OptimizationService:
     @classmethod
-    def _optimize_via_llm(
+    async def _optimize_via_llm(
         cls,
         resume_json: Dict[str, Any],
         role_json: Dict[str, Any],
@@ -35,7 +35,7 @@ class OptimizationService:
         )
         
         try:
-            out = call_llm(prompt, temperature=0.3)
+            out = await call_llm(prompt, temperature=0.3)
         except Exception as e:
             logger.warning(f"LLM optimization failed, falling back to heuristic: {e}")
             return None
@@ -58,7 +58,7 @@ class OptimizationService:
         return {"optimization_opportunities": normalized}
 
     @classmethod
-    def simulate_resume_optimizations(
+    async def simulate_resume_optimizations(
         cls, 
         resume_json: Dict[str, Any], 
         role_json: Dict[str, Any], 
@@ -72,7 +72,7 @@ class OptimizationService:
             resume_json, role_json, semantic_result
         )
         if settings.USE_LLM:
-            result = cls._optimize_via_llm(
+            result = await cls._optimize_via_llm(
                 resume_json, role_json, semantic_result, prediction_result
             )
             if result is not None:

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "concurrently \"cd ../backend && .venv\\Scripts\\python -m uvicorn main:app --reload --port 5000\" \"vite\"",
+    "start": "concurrently \"cd ../backend && .venv\\Scripts\\python -m uvicorn main:app --reload --port 8001\" \"cd ../backend-analysis && .venv\\Scripts\\python -m uvicorn main:app --reload --port 8000\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

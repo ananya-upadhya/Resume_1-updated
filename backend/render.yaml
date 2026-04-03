@@ -1,0 +1,17 @@
+# render.yaml
+# Render free-tier deployment for Resume Builder Export API
+# Free plan: 512MB RAM, shared CPU, spun down after 15min inactivity
+
+services:
+  - type: web
+    name: resume-export-service
+    runtime: python
+    plan: free
+    region: oregon
+
+    buildCommand: |
+      pip install -r requirements.txt
+
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
+
+    healthCheckPath: /

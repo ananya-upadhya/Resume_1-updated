@@ -1,33 +1,28 @@
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const KEY = () => import.meta.env.VITE_GROQ_KEY;
+const ANALYZE_API = import.meta.env.VITE_ANALYZE_API_URL || "http://localhost:8000";
 
 async function callGroq(systemPrompt, userPrompt) {
-    const key = import.meta.env.VITE_GROQ_KEY;
     // Guard against empty prompts
-    if (!userPrompt || userPrompt.trim().length < 10) {
+    if (!userPrompt || userPrompt.trim().length < 5) {
         throw new Error("Input too short");
     }
-    const res = await fetch(GROQ_URL, {
+
+    const res = await fetch(`${ANALYZE_API}/api/llm/enhance`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${key}`,
         },
         body: JSON.stringify({
-            model: "llama-3.3-70b-versatile",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
-            ],
-            temperature: 0.7,
-            max_tokens: 300,
+            system_prompt: systemPrompt,
+            user_prompt: userPrompt,
         }),
     });
 
     const data = await res.json();
-    console.log("GROQ 400 DETAIL:", JSON.stringify(data));
-    if (!res.ok) throw new Error(data.error?.message || "Groq error");
-    return data.choices?.[0]?.message?.content?.trim() || "";
+    if (!res.ok) {
+        console.error("Enhancement API error:", data);
+        throw new Error(data.detail || "AI enhancement failed");
+    }
+    return data.result || "";
 }
 // Each field type gets its own focused prompt
 export const ENHANCERS = {

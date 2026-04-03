@@ -143,27 +143,7 @@ const STYLES = `
     font-size:.65rem; color:#6B5A3A; letter-spacing:.08em;
   }
 
-  .lp-scroll-hint {
-    position:absolute; bottom:1.8rem; left:50%; transform:translateX(-50%);
-    display:flex; flex-direction:column; align-items:center; gap:.35rem;
-    cursor:pointer; opacity:.45; transition:opacity .2s;
-    animation: fadeIn 1s ease 1s both;
-  }
-  .lp-scroll-hint:hover { opacity:.85; }
-  .lp-scroll-hint-lbl {
-    font-size:.55rem; letter-spacing:.14em; text-transform:uppercase;
-    color:#C9A84C;
-  }
-  .lp-scroll-arrow {
-    width:18px; height:18px; border-right:1.5px solid #C9A84C;
-    border-bottom:1.5px solid #C9A84C;
-    transform:rotate(45deg);
-    animation:scrollBounce 1.4s ease infinite;
-  }
-  @keyframes scrollBounce {
-    0%,100%{transform:rotate(45deg) translateY(0)}
-    50%{transform:rotate(45deg) translateY(5px)}
-  }
+
 
   .lp-features {
     position:relative; z-index:1;
@@ -276,11 +256,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Scroll hint */}
-            <div className="lp-scroll-hint" onClick={scrollToFeatures}>
-              <div className="lp-scroll-hint-lbl">Explore</div>
-              <div className="lp-scroll-arrow" />
-            </div>
           </div>
 
           {/* Features */}

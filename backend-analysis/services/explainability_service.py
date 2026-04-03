@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 
 class ExplainabilityService:
-    @staticmethod
-    def _explain_via_llm(
+    async def _explain_via_llm(
+        self,  # It was @staticmethod but I'll make it properly callable if needed, or keep static
         resume_json: Dict[str, Any],
         role_json: Dict[str, Any],
         semantic_result: Dict[str, Any],
@@ -26,7 +26,7 @@ class ExplainabilityService:
         }
         prompt = PROMPT_3_EXPLAINABILITY.replace("{{ANALYSIS_JSON}}", json.dumps(analysis_json, default=str))
         try:
-            out = call_llm(prompt, temperature=0.3)
+            out = await call_llm(prompt, temperature=0.3)
         except Exception as e:
             logger.warning(f"LLM explainability failed, falling back to heuristic: {e}")
             return None
@@ -48,7 +48,7 @@ class ExplainabilityService:
         }
 
     @staticmethod
-    def generate_analysis_explanation(
+    async def generate_analysis_explanation(
         resume_json: Dict[str, Any],
         role_json: Dict[str, Any],
         semantic_result: Dict[str, Any],
@@ -56,7 +56,7 @@ class ExplainabilityService:
     ) -> Dict[str, Any]:
         
         if settings.USE_LLM:
-            result = ExplainabilityService._explain_via_llm(
+            result = await ExplainabilityService()._explain_via_llm(
                 resume_json, role_json, semantic_result, prediction_result
             )
             if result is not None:

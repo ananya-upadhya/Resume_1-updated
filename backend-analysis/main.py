@@ -13,6 +13,7 @@ from routers import (
     prediction_router,
     explainability_router,
     optimization_router,
+    llm_router,
 )
 
 logging.basicConfig(
@@ -48,7 +49,7 @@ async def startup_event():
     logger.info(f"LLM config: provider={settings.LLM_PROVIDER}, model={settings.LLM_MODEL}, use_llm={settings.USE_LLM}")
 
     if settings.USE_LLM and settings.LLM_PROVIDER == "groq":
-        reachable = check_groq_running()
+        reachable = await check_groq_running()
         if reachable:
             logger.info("✓ Groq API reachable — LLM suggestions enabled.")
         else:
@@ -71,6 +72,7 @@ app.include_router(semantic_matching.router,    prefix="/api", tags=["Semantic M
 app.include_router(prediction_router.router,    prefix="/api", tags=["Prediction"])
 app.include_router(explainability_router.router, prefix="/api", tags=["Explainability"])
 app.include_router(optimization_router.router,  prefix="/api", tags=["Optimization"])
+app.include_router(llm_router.router,           prefix="/api", tags=["LLM"])
 
 
 if __name__ == "__main__":

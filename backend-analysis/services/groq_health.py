@@ -10,7 +10,7 @@ from config.settings import settings
 logger = logging.getLogger(__name__)
 
 
-def check_groq_running() -> bool:
+async def check_groq_running() -> bool:
     """
     Ping Groq API with a minimal test call.
     Returns True if reachable, False on any exception.
@@ -22,10 +22,10 @@ def check_groq_running() -> bool:
         )
         return False
     try:
-        from groq import Groq
-        client = Groq(api_key=settings.GROQ_API_KEY)
+        from groq import AsyncGroq
+        client = AsyncGroq(api_key=settings.GROQ_API_KEY)
         # Minimal token call — just enough to verify connectivity
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=settings.LLM_MODEL,
             messages=[{"role": "user", "content": "ping"}],
             max_tokens=5,

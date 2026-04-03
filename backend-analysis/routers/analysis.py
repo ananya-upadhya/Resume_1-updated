@@ -38,7 +38,7 @@ async def perform_full_analysis(
         prediction_result = PredictionService.compute_shortlisting_probability(resume_dict, role_dict, semantic_result)
         
         # Step 5: Explainability Engine
-        explanations = explainability_service.generate_analysis_explanation(resume_dict, role_dict, semantic_result, prediction_result)
+        explanations = await explainability_service.generate_analysis_explanation(resume_dict, role_dict, semantic_result, prediction_result)
         
         # Compute missing skills mapping dynamically to ease frontend mapping
         resume_skills_lower = {s.lower() for s in resume_dict.get("skills", [])}
@@ -49,7 +49,7 @@ async def perform_full_analysis(
         
         # Step 6: Resume Optimization Simulator
         # Calculate theoretical score improvements from targeted actions
-        optimization_payload = OptimizationService.simulate_resume_optimizations(resume_dict, role_dict, semantic_result)
+        optimization_payload = await OptimizationService.simulate_resume_optimizations(resume_dict, role_dict, semantic_result)
         optimization_opportunities = optimization_payload.get("optimization_opportunities", [])
         
         return {
