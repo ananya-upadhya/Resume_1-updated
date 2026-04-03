@@ -63,6 +63,8 @@ app.include_router(explainability_router.router, prefix="/api", tags=["Explainab
 app.include_router(optimization_router.router,  prefix="/api", tags=["Optimization"])
 app.include_router(llm_router.router,           prefix="/api", tags=["LLM"])
 
+if __name__ == "__main__":
     import os
+    import uvicorn
     port = int(os.environ.get("PORT", 8000))
     uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
