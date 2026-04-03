@@ -48,19 +48,8 @@ async def startup_event():
     logger.info(f"Starting {settings.PROJECT_NAME} v{settings.VERSION}")
     logger.info(f"LLM config: provider={settings.LLM_PROVIDER}, model={settings.LLM_MODEL}, use_llm={settings.USE_LLM}")
 
-    if settings.USE_LLM and settings.LLM_PROVIDER == "groq":
-        reachable = await check_groq_running()
-        if reachable:
-            logger.info("✓ Groq API reachable — LLM suggestions enabled.")
-        else:
-            logger.warning(
-                "⚠ Groq API unreachable — app will run in heuristic-only fallback mode. "
-                "Set GROQ_API_KEY in .env to enable personalized suggestions."
-            )
-    elif settings.USE_LLM and settings.LLM_PROVIDER != "groq":
-        logger.info(f"LLM provider '{settings.LLM_PROVIDER}' configured (not Groq — skipping health check).")
-    else:
-        logger.info("USE_LLM=false — running in full heuristic mode.")
+    # Startup health check removed to prevent Render deployment timeouts.
+    # Health status is now reported dynamically via the /health endpoint.
 
 
 # ── Register all routers ──────────────────────────────────────────────────────
@@ -74,7 +63,6 @@ app.include_router(explainability_router.router, prefix="/api", tags=["Explainab
 app.include_router(optimization_router.router,  prefix="/api", tags=["Optimization"])
 app.include_router(llm_router.router,           prefix="/api", tags=["LLM"])
 
-import os 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 10000)))
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
