@@ -52,6 +52,15 @@ async def startup_event():
     # Health status is now reported dynamically via the /health endpoint.
 
 
+@app.get("/")
+async def root():
+    return {
+        "message": "Resume Intelligence API is running",
+        "docs": "/docs",
+        "health": "/health"
+    }
+
+
 # ── Register all routers ──────────────────────────────────────────────────────
 app.include_router(system.router,               tags=["System"])
 app.include_router(analysis.router,             prefix="/api", tags=["Full Analysis"])
