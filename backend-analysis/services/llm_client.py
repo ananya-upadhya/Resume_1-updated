@@ -42,7 +42,9 @@ def _parse_json(content: str) -> Dict[str, Any]:
 # GROQ PROVIDER  (active)
 # ──────────────────────────────────────────────────────────────────
 async def _call_groq(prompt: str, temperature: float) -> Dict[str, Any]:
-    from groq import AsyncGroq  # pip install groq>=0.4.0
+    if not settings.GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY is not set in environment variables.")
+    from groq import AsyncGroq # pip install groq>=0.4.0
     client = AsyncGroq(api_key=settings.GROQ_API_KEY)
     response = await client.chat.completions.create(
         model=settings.LLM_MODEL,
@@ -56,6 +58,8 @@ async def _call_groq(prompt: str, temperature: float) -> Dict[str, Any]:
 
 
 async def _call_groq_text(system_prompt: str, user_prompt: str, temperature: float) -> str:
+    if not settings.GROQ_API_KEY:
+        raise ValueError("GROQ_API_KEY is not set in environment variables.")
     from groq import AsyncGroq
     client = AsyncGroq(api_key=settings.GROQ_API_KEY)
     messages = []

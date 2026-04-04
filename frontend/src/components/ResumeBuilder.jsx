@@ -1541,7 +1541,7 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ...data, templateId }),
         });
-        if (!res.ok) throw new Error("Export failed — is the backend running on port 5000?");
+        if (!res.ok) throw new Error("Export failed — the export service is temporarily unavailable.");
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -1551,7 +1551,7 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
         URL.revokeObjectURL(url);
         showBanner("success", "Download started! Check your Downloads folder.");
       } catch (err) {
-        showBanner("error", err.message || "Export failed.");
+        showBanner("error", err.message || "Export failed. Please try again later.");
       } finally {
         setExporting(false);
       }

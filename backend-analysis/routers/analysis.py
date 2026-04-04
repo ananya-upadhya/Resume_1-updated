@@ -20,6 +20,13 @@ async def perform_full_analysis(
 ):
     if not file.filename.lower().endswith((".pdf", ".docx")):
         raise HTTPException(status_code=400, detail="Invalid file type. Must be PDF or DOCX.")
+    
+    # Loophole Fix: File size limit (5MB)
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large. Max 5MB allowed.")
+    await file.seek(0) # Reset to start for parser_service
         
     try:
         # Step 1: Parse Resume

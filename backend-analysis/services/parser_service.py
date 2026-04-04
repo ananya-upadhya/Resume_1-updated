@@ -15,12 +15,17 @@ except OSError:
     nlp = en_core_web_sm.load()
 
 SKILL_DICTIONARY = {
-    "react", "javascript", "python", "node", "aws", "docker", "sql",
-    "typescript", "java", "c++", "c#", "ruby", "go", "rust",
-    "html", "css", "mongodb", "postgresql", "mysql", "redis",
-    "kubernetes", "azure", "gcp", "git", "linux", "machine learning",
+    # Tech
+    "react", "javascript", "python", "node", "aws", "docker", "sql", "typescript", 
+    "java", "c++", "c#", "ruby", "go", "rust", "html", "css", "mongodb", "postgresql", 
+    "mysql", "redis", "kubernetes", "azure", "gcp", "git", "linux", "machine learning",
     "data analysis", "agile", "scrum", "vue", "angular", "nextjs", "django",
-    "fastapi", "flask", "express", "spring boot", "react native"
+    "fastapi", "flask", "express", "spring boot", "react native", "flutter",
+    "pandas", "numpy", "tableau", "power bi", "hadoop", "spark", "kafka",
+    
+    # Business & Soft
+    "management", "leadership", "project management", "communication", "teamwork",
+    "problem solving", "customer service", "sales", "marketing", "seo", "ux", "ui",
 }
 
 class ParserService:

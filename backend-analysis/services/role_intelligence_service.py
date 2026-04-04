@@ -16,19 +16,40 @@ except OSError:
 
 # Predefined dictionaries according to specification
 SKILLS_DICTIONARY = {
-    "react", "javascript", "redux", "node", "python", "aws", 
-    "docker", "kubernetes", "sql", "typescript", "java", "c++", 
-    "c#", "go", "ruby", "php", "html", "css", "mongodb", "postgresql",
-    "mysql", "redis", "azure", "gcp", "machine learning", "data science",
-    "spring boot", "django", "fastapi", "flask", "nextjs", "next.js", "vue", "angular",
-    "graphql", "rest api", "ci/cd", "agile", "scrum", "terraform", "ansible",
-    "keras", "tensorflow", "pytorch", "tailwind", "express", "scala", "kotlin"
+    # Programming Languages
+    "react", "javascript", "redux", "node", "python", "aws", "docker", "kubernetes", 
+    "sql", "typescript", "java", "c++", "c#", "go", "ruby", "php", "html", "css", 
+    "mongodb", "postgresql", "mysql", "redis", "azure", "gcp", "machine learning", 
+    "data science", "spring boot", "django", "fastapi", "flask", "nextjs", "next.js", 
+    "vue", "angular", "graphql", "rest api", "ci/cd", "agile", "scrum", "terraform", 
+    "ansible", "keras", "tensorflow", "pytorch", "tailwind", "express", "scala", "kotlin",
+    "rust", "dart", "flutter", "swift", "objective-c", "shell", "bash", "powershell",
+    
+    # Data & AI
+    "pandas", "numpy", "scikit-learn", "scipy", "matplotlib", "seaborn", "tableau", 
+    "power bi", "hadoop", "spark", "kafka", "airflow", "snowflake", "bigquery",
+    "nlp", "computer vision", "llm", "generative ai", "openai", "langchain",
+    
+    # DevOps & Cloud
+    "jenkins", "github actions", "circleci", "git", "linux", "unix", "ubuntu",
+    "nginx", "apache", "serverless", "lambda", "ecs", "eks", "s3", "iam",
+    
+    # Business & Soft Skills
+    "management", "leadership", "project management", "communication", "teamwork",
+    "problem solving", "customer service", "sales", "marketing", "seo", "ux", "ui",
+    "figma", "sketch", "adobe xd", "photoshop", "illustrator", "analytical skills",
+    "public speaking", "negotiation", "conflict resolution", "time management",
+    
+    # Professional Areas
+    "frontend", "backend", "fullstack", "mobile development", "cloud computing",
+    "cybersecurity", "blockchain", "embedded systems", "qa testing", "automation"
 }
 
 TOOLS_DICTIONARY = {
     "git", "docker", "jira", "postman", "kubernetes", "jenkins", 
     "github", "gitlab", "bitbucket", "confluence", "trello",
-    "figma", "sketch", "slack", "webpack", "npm", "yarn"
+    "figma", "sketch", "slack", "webpack", "npm", "yarn", "vite", "babel",
+    "vs code", "pycharm", "intellij", "docker desktop", "aws console", "gcp console"
 }
 
 ACTION_VERBS = {

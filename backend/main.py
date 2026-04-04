@@ -37,14 +37,14 @@ class Summary(BaseModel):
 
 class Experience(BaseModel):
     id:str=""; company:str=""; role:str=""
-    start:str=""; end:str=""; current:bool=False; bullets:str=""
+    start:str=""; end:str=""; current:bool=False; bullets: List[str] = []
 
 class Education(BaseModel):
     id:str=""; institution:str=""; degree:str=""
     field:str=""; start:str=""; end:str=""; gpa:str=""
 
 class Project(BaseModel):
-    id:str=""; name:str=""; tech:str=""; url:str=""; bullets:str=""
+    id:str=""; name:str=""; tech:str=""; url:str=""; bullets: List[str] = []
 
 class Certification(BaseModel):
     id:str=""; name:str=""; issuer:str=""; date:str=""
@@ -147,9 +147,12 @@ async def export_pdf(data: ResumeData):
                                  color=pal["sub"]))
         story.append(Spacer(1, 3))
 
-    def bullets(text):
-        if not text: return
-        for b in text.split("\n"):
+    def bullets(items):
+        if not items: return
+        # Handle both string (legacy) and list (analysis)
+        if isinstance(items, str):
+            items = items.split("\n")
+        for b in items:
             b = b.strip().lstrip("-•▸◆→*").strip()
             if b:
                 story.append(Paragraph(
@@ -305,9 +308,12 @@ async def export_docx(data: ResumeData):
         p.paragraph_format.left_indent  = Inches(0.15)
         p.paragraph_format.space_after  = Pt(1)
 
-    def add_bullets(bullets_text):
-        if not bullets_text: return
-        for b in bullets_text.split("\n"):
+    def add_bullets(items):
+        if not items: return
+        # Handle both string (legacy) and list (analysis)
+        if isinstance(items, str):
+            items = items.split("\n")
+        for b in items:
             b = b.strip()
             if b: add_bullet(b)
 
