@@ -4,7 +4,7 @@
 
 services:
   - type: web
-    name: resume-intelligence-api
+    name: resume-analysis-service
     runtime: python
     plan: free
     region: oregon
