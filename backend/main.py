@@ -20,12 +20,8 @@ from resume_pdf  import build_pdf
 app = FastAPI(title="ResumeBuilder Backend", version="1.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "https://resume-1-updated.vercel.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
