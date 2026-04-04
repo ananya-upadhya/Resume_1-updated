@@ -15,17 +15,25 @@ except OSError:
     nlp = en_core_web_sm.load()
 
 SKILL_DICTIONARY = {
-    # Tech
+    # Frontend Tech
     "react", "javascript", "python", "node", "aws", "docker", "sql", "typescript", 
-    "java", "c++", "c#", "ruby", "go", "rust", "html", "css", "mongodb", "postgresql", 
+    "java", "c++", "c#", "ruby", "go", "rust", "html", "html5", "css", "css3", "mongodb", "postgresql", 
     "mysql", "redis", "kubernetes", "azure", "gcp", "git", "linux", "machine learning",
-    "data analysis", "agile", "scrum", "vue", "angular", "nextjs", "django",
+    "data analysis", "agile", "scrum", "vue", "angular", "nextjs", "next.js", "django",
     "fastapi", "flask", "express", "spring boot", "react native", "flutter",
     "pandas", "numpy", "tableau", "power bi", "hadoop", "spark", "kafka",
+    "redux", "webpack", "bootstrap", "tailwind", "sass", "less", "graphql", 
+    "apollo", "jest", "cypress", "playwright", "vite", "babel", "npm", "yarn", 
+    "pnpm", "material ui", "mui", "chakra ui", "shadcn", "svelte", "solid",
+    
+    # Backend & Infrastructure
+    "firebase", "supabase", "strapi", "contentful", "microservices", "rest api", "api",
+    "ci/cd", "jenkins", "github actions", "terraform", "ansible", "nginx", "apache",
     
     # Business & Soft
     "management", "leadership", "project management", "communication", "teamwork",
     "problem solving", "customer service", "sales", "marketing", "seo", "ux", "ui",
+    "figma", "sketch", "adobe xd", "product design"
 }
 
 class ParserService:
@@ -62,16 +70,32 @@ class ParserService:
 
     @staticmethod
     def extract_skills(text: str) -> List[str]:
-        doc = nlp(text.lower())
+        # Normalize text and handle specialty characters like '·' (middle dot)
+        # Replace middle dots, bullets, vertical bars, and slashes with spaces to facilitate word boundaries
+        clean_search_text = re.sub(r'[·•|/]', ' ', text.lower())
+        doc = nlp(clean_search_text)
+        
         skills_found = set()
+        
+        # Method 1: Token-based match
         for token in doc:
             if token.text in SKILL_DICTIONARY:
                 skills_found.add(token.text)
-        text_lower = text.lower()
+        
+        # Method 2: Substring match for multi-word skills and versions
         for skill in SKILL_DICTIONARY:
-            if " " in skill and skill in text_lower:
-                skills_found.add(skill)
-        return sorted([s.title() if s != "aws" and s != "sql" else s.upper() for s in skills_found])
+            if len(skill) > 2: # Avoid tiny substring matches
+                # Use regex with word boundaries for precision
+                pattern = r'\b' + re.escape(skill) + r'\b'
+                if re.search(pattern, clean_search_text):
+                    skills_found.add(skill)
+        
+        # Specialty handling for HTML5/CSS3 specifically if they appear as tokens
+        # sometimes tokens are "html5" but dictionary has "html"
+        if "html5" in clean_search_text: skills_found.add("html5")
+        if "css3" in clean_search_text: skills_found.add("css3")
+        
+        return sorted([s.title() if s not in ["aws", "sql"] else s.upper() for s in skills_found])
 
     @staticmethod
     def extract_experience(text: str) -> List[ExperienceItem]:

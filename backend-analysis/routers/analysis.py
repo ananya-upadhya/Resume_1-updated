@@ -35,7 +35,7 @@ async def perform_full_analysis(
         resume_dict = parsed_resume.model_dump()
         
         # Step 2: Role Intelligence Extraction
-        role_data = RoleIntelligenceService.process_job_description(job_description)
+        role_data = await RoleIntelligenceService.process_job_description(job_description)
         role_dict = role_data.model_dump()
         
         # Step 3: Semantic Matching

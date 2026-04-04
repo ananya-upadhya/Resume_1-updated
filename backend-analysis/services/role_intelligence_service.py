@@ -14,16 +14,16 @@ except OSError:
     import en_core_web_sm
     nlp = en_core_web_sm.load()
 
-# Predefined dictionaries according to specification
 SKILLS_DICTIONARY = {
-    # Programming Languages
+    # Programming Languages & Frameworks
     "react", "javascript", "redux", "node", "python", "aws", "docker", "kubernetes", 
-    "sql", "typescript", "java", "c++", "c#", "go", "ruby", "php", "html", "css", 
+    "sql", "typescript", "java", "c++", "c#", "go", "ruby", "php", "html", "html5", "css", "css3", 
     "mongodb", "postgresql", "mysql", "redis", "azure", "gcp", "machine learning", 
     "data science", "spring boot", "django", "fastapi", "flask", "nextjs", "next.js", 
     "vue", "angular", "graphql", "rest api", "ci/cd", "agile", "scrum", "terraform", 
     "ansible", "keras", "tensorflow", "pytorch", "tailwind", "express", "scala", "kotlin",
     "rust", "dart", "flutter", "swift", "objective-c", "shell", "bash", "powershell",
+    "webpack", "bootstrap", "sass", "less", "vite", "babel", "jest", "cypress",
     
     # Data & AI
     "pandas", "numpy", "scikit-learn", "scipy", "matplotlib", "seaborn", "tableau", 
@@ -170,13 +170,48 @@ class RoleIntelligenceService:
         return unique_resp
 
     @classmethod
-    def process_job_description(cls, text: str) -> RoleData:
+    async def process_job_description(cls, text: str) -> RoleData:
         logger.info("Extracting role intelligence parameters from job description")
         cleaned_text = cls.clean_text(text)
+        
+        extracted_skills = cls.extract_skills(cleaned_text)
+        
+        # Heuristic/LLM Synergy: If text is very short (likely just a title) 
+        # and we only found the title itself as a "skill", use LLM to deduce real skills.
+        if settings.USE_LLM and (len(cleaned_text.split()) < 6 or len(extracted_skills) <= 1):
+             try:
+                 from services.llm_client import call_llm
+                 prompt = f"""
+                 The user provided a target role: "{cleaned_text}".
+                 This is a very sparse job description. 
+                 Deduce 6-10 essential technical skills and tools that are standard for this specific role.
+                 Return ONLY a JSON object with:
+                 - "required_skills": List of skill strings
+                 - "tools": List of tool strings
+                 - "responsibilities": List of typical responsibilities (3-5 items)
+                 
+                 Example for "Frontend Developer":
+                 {{
+                   "required_skills": ["React", "JavaScript", "HTML5", "CSS3", "TypeScript"],
+                   "tools": ["Git", "Webpack", "Vite", "VS Code"],
+                   "responsibilities": ["Build responsive UI components", "Optimize for performance"]
+                 }}
+                 """
+                 llm_data = await call_llm(prompt)
+                 
+                 return RoleData(
+                     role=cls.extract_role(cleaned_text),
+                     required_skills=llm_data.get("required_skills", extracted_skills),
+                     tools=llm_data.get("tools", cls.extract_tools(cleaned_text)),
+                     experience_level=cls.extract_experience(cleaned_text),
+                     responsibilities=llm_data.get("responsibilities", cls.extract_responsibilities(cleaned_text))
+                 )
+             except Exception as e:
+                 logger.error(f"LLM skill deduction failed: {e}")
 
         role_data = RoleData(
             role=cls.extract_role(cleaned_text),
-            required_skills=cls.extract_skills(cleaned_text),
+            required_skills=extracted_skills,
             tools=cls.extract_tools(cleaned_text),
             experience_level=cls.extract_experience(cleaned_text),
             responsibilities=cls.extract_responsibilities(cleaned_text)
