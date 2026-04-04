@@ -43,7 +43,8 @@ export default function Analyze() {
       formData.append('file', file)
       formData.append('job_description', role)
 
-      const API_URL = import.meta.env.VITE_ANALYZE_API_URL || 'http://localhost:8000'
+      const API_URL_RAW = import.meta.env.VITE_ANALYZE_API_URL || 'http://localhost:8000'
+      const API_URL = API_URL_RAW.replace(/\/api$/, "").replace(/\/$/, "");
       console.log('Starting fetch to:', `${API_URL}/api/full-analysis`)
       const analyzeRes = await fetch(`${API_URL}/api/full-analysis`, {
         method: 'POST',

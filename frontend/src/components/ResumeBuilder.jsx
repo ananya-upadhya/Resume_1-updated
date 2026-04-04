@@ -5,7 +5,8 @@ import SelectedTemplate from "../templates/index.jsx";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-const API = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API = API_BASE.replace(/\/api$/, "").replace(/\/$/, "");
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');

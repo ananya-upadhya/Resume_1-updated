@@ -1,4 +1,5 @@
-const ANALYZE_API = import.meta.env.VITE_ANALYZE_API_URL || "http://localhost:8000";
+const ANALYZE_API_BASE = import.meta.env.VITE_ANALYZE_API_URL || "http://localhost:8000";
+const ANALYZE_API = ANALYZE_API_BASE.replace(/\/api$/, "").replace(/\/$/, "");
 
 async function callGroq(systemPrompt, userPrompt) {
     // Guard against empty prompts
