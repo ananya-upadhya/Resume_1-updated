@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UploadCloud, Search, File, AlertCircle } from 'lucide-react'
+import { UploadCloud, Search, File, AlertCircle, Target, CheckCircle2, XCircle } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
-import ResultsDashboard from '@/components/analyze/ResultsDashboard'
 
 export default function Analyze() {
   const [file, setFile] = useState(null)
   const [role, setRole] = useState('')
+  const [jobDescription, setJobDescription] = useState('')
   const [loadingStage, setLoadingStage] = useState('idle')
   const [showResults, setShowResults] = useState(false)
   const [error, setError] = useState('')
@@ -32,7 +32,7 @@ export default function Analyze() {
 
   const handleAnalyze = async () => {
     if (!file) { setError('Please upload a file first.'); return }
-    if (!role.trim()) { setError('Please specify a target role.'); return }
+    if (!role.trim() && !jobDescription.trim()) { setError('Please specify a target role or job description.'); return }
 
     setError('')
     setLoadingStage('uploading')
@@ -41,28 +41,25 @@ export default function Analyze() {
       setLoadingStage('analyzing')
       const formData = new FormData()
       formData.append('file', file)
-      formData.append('job_description', role)
+      formData.append('role', role)
+      formData.append('job_description', jobDescription)
 
-      const API_URL_RAW = import.meta.env.VITE_ANALYZE_API_URL || 'http://localhost:8000'
-      const API_URL = API_URL_RAW.replace(/\/api$/, "").replace(/\/$/, "");
-      console.log('Starting fetch to:', `${API_URL}/api/full-analysis`)
-      const analyzeRes = await fetch(`${API_URL}/api/full-analysis`, {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const analyzeRes = await fetch(`${API_URL}/api/analyze`, {
         method: 'POST',
         body: formData,
       })
 
       if (!analyzeRes.ok) {
         const errData = await analyzeRes.json().catch(() => ({}))
-        console.error('Fetch error response:', errData)
-        throw new Error(errData.detail?.message || errData.detail || `Server error: ${analyzeRes.status}`)
+        throw new Error(errData.detail || `Server error: ${analyzeRes.status}`)
       }
 
       const payload = await analyzeRes.json()
-      console.log('Full Analysis Output SUCCESS:', payload)
       setAnalysisData(payload)
       setShowResults(true)
     } catch (err) {
-      console.error('Caught error during handleAnalyze:', err)
+      console.error(err)
       setError(err instanceof Error ? err.message : 'An error occurred during analysis')
     } finally {
       setLoadingStage('idle')
@@ -77,12 +74,42 @@ export default function Analyze() {
     }
   }
 
+  const renderScoreCircle = (label, score) => {
+    const s = Math.round(score || 0)
+    const color = s >= 75 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444'
+    const circumference = 2 * Math.PI * 38
+    const strokeDashoffset = circumference - (s / 100) * circumference
+    
+    return (
+      <div className="flex flex-col items-center">
+        <div className="relative w-24 h-24 flex items-center justify-center">
+          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" stroke="rgba(201,168,76,0.15)" strokeWidth="8" fill="none" />
+            <circle 
+              cx="50" cy="50" r="38" 
+              stroke={color} 
+              strokeWidth="8" fill="none" 
+              strokeDasharray={circumference} 
+              strokeDashoffset={strokeDashoffset} 
+              strokeLinecap="round" 
+              className="transition-all duration-1000 ease-out"
+            />
+          </svg>
+          <div className="absolute text-xl font-bold" style={{ color: 'var(--accent-gold)' }}>
+            {s}%
+          </div>
+        </div>
+        <p className="mt-3 text-sm font-semibold text-center whitespace-pre-wrap" style={{ color: 'rgba(201,168,76,0.9)' }}>{label}</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-12 max-w-5xl mx-auto">
       <div>
         <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Analyze Resume</h1>
-        <p className="mt-2" style={{ color: 'rgba(201,168,76,0.8)' }}>
-          Upload a resume and specify a target role to generate AI intelligence.
+        <p className="mt-2 text-sm md:text-base" style={{ color: 'rgba(201,168,76,0.8)' }}>
+          Upload a resume and provide job context to generate intelligence scoring.
         </p>
       </div>
 
@@ -97,14 +124,15 @@ export default function Analyze() {
             className="grid gap-6 md:grid-cols-2"
           >
             {/* Drop Zone */}
-            <Card className="md:col-span-2">
+            <Card className="col-span-1 md:col-span-2">
               <CardContent className="pt-6">
                 <div
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
+                  className={`border-2 border-dashed rounded-xl p-8 md:p-12 text-center transition-colors flex flex-col items-center justify-center ${
                     file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
                   }`}
+                  style={{ borderColor: file ? 'var(--accent-gold)' : 'rgba(201,168,76,0.3)', backgroundColor: file ? 'rgba(201,168,76,0.05)' : 'transparent' }}
                 >
                     <motion.div
                       animate={{ y: [0, -10, 0] }}
@@ -112,14 +140,14 @@ export default function Analyze() {
                       className="flex justify-center mb-4"
                     >
                       {file
-                        ? <File className="h-16 w-16" style={{ color: 'var(--accent-gold)' }} />
-                        : <UploadCloud className="h-16 w-16" style={{ color: 'var(--text-muted)' }} />
+                        ? <File className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'var(--accent-gold)' }} />
+                        : <UploadCloud className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'var(--text-muted)' }} />
                       }
                     </motion.div>
-                    <h3 className="text-xl font-semibold mb-2" style={{ fontFamily: "'Cinzel', serif", color: 'var(--accent-gold)' }}>
+                    <h3 className="text-lg md:text-xl font-semibold mb-2" style={{ fontFamily: "'Cinzel', serif", color: 'var(--accent-gold)' }}>
                       {file ? file.name : 'Drag & drop your resume'}
                     </h3>
-                    <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
+                    <p className="text-xs md:text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
                     {file
                       ? `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`
                       : 'Supports PDF and DOCX formats up to 5MB'
@@ -157,33 +185,53 @@ export default function Analyze() {
               </CardContent>
             </Card>
 
-            {/* Role Input */}
-            <Card className="md:col-span-2">
+            {/* Role & Job Description */}
+            <Card className="col-span-1 md:col-span-2">
               <CardHeader>
-                <CardTitle style={{ color: 'var(--accent-gold)' }}>Target Role Context</CardTitle>
-                <CardDescription style={{ color: 'rgba(201,168,76,0.8)' }}>What job is this resume targeting?</CardDescription>
+                <CardTitle style={{ color: 'var(--accent-gold)' }}>Target Role & Job Description</CardTitle>
+                <CardDescription style={{ color: 'rgba(201,168,76,0.8)' }}>Provide the context to run keyword matching</CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="flex space-x-4">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-3 top-3 h-4 w-4" style={{ color: 'rgba(201,168,76,0.6)' }} />
-                    <Input
-                      disabled={loadingStage !== 'idle'}
-                      placeholder="e.g. Senior Frontend Engineer, Product Manager"
-                      className="pl-10 h-10"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      style={{ background: 'rgba(201,168,76,0.05)', borderColor: 'rgba(201,168,76,0.2)', color: 'var(--text-primary)' }}
-                    />
-                  </div>
+              <CardContent className="flex flex-col gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4" style={{ color: 'rgba(201,168,76,0.6)' }} />
+                  <Input
+                    disabled={loadingStage !== 'idle'}
+                    placeholder="Role Title (e.g. Senior Frontend Engineer)"
+                    className="pl-10 h-10 w-full"
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    style={{ background: 'rgba(201,168,76,0.05)', borderColor: 'rgba(201,168,76,0.2)', color: 'var(--text-primary)' }}
+                  />
+                </div>
+                
+                <div className="relative">
+                  <textarea 
+                    disabled={loadingStage !== 'idle'}
+                    placeholder="Paste the full job description here..."
+                    className="w-full min-h-[120px] p-3 rounded-md border"
+                    value={jobDescription}
+                    onChange={(e) => setJobDescription(e.target.value)}
+                    style={{ 
+                      background: 'rgba(201,168,76,0.05)', 
+                      borderColor: 'rgba(201,168,76,0.2)', 
+                      color: 'var(--text-primary)',
+                      outline: 'none',
+                      resize: 'vertical',
+                      fontSize: '0.875rem'
+                    }}
+                  />
+                </div>
+
+                <div className="flex justify-end mt-2">
                   <button
                     onClick={handleAnalyze}
                     disabled={loadingStage !== 'idle'}
+                    className="w-full md:w-auto"
                     style={{
-                      minWidth: '200px',
+                      padding: '10px 24px',
                       background: 'linear-gradient(135deg, #A07830, #C9A84C, #F0C040)',
                       color: '#080808',
-                      borderRadius: '10px',
+                      borderRadius: '8px',
                       fontFamily: "'Cinzel', serif",
                       fontWeight: 700,
                       letterSpacing: '0.08em',
@@ -191,10 +239,10 @@ export default function Analyze() {
                       cursor: loadingStage !== 'idle' ? 'not-allowed' : 'pointer',
                       opacity: loadingStage !== 'idle' ? 0.7 : 1,
                       transition: 'all 0.2s ease',
-                      boxShadow: '0 4px 24px rgba(201,168,76,0.3)',
+                      boxShadow: '0 4px 20px rgba(201,168,76,0.25)',
                     }}
-                    onMouseEnter={e => { if (loadingStage === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 32px rgba(201,168,76,0.45)' } }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(201,168,76,0.3)' }}
+                    onMouseEnter={e => { if (loadingStage === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)' } }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
                   >
                     {loadingStage !== 'idle' ? (
                       <div className="flex items-center justify-center">
@@ -205,7 +253,7 @@ export default function Analyze() {
                         />
                         {getLoadingText()}
                       </div>
-                    ) : 'Analyze Profile'}
+                    ) : 'Analyze Match'}
                   </button>
                 </div>
               </CardContent>
@@ -217,54 +265,122 @@ export default function Analyze() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="space-y-6"
           >
-            <div className="mb-6 flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 className="text-xl font-bold flex items-center gap-3" style={{ color: 'var(--accent-gold)' }}>
-                  Analysis Results
-                  {analysisData?.semantic_fit_score !== undefined && (
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      analysisData.semantic_fit_score > 0.6
-                        ? 'bg-green-500/10 text-green-500'
-                        : analysisData.semantic_fit_score > 0.4
-                        ? 'bg-amber-500/10 text-amber-500'
-                        : 'bg-red-500/10 text-red-500'
-                    }`}>
-                      Fit: {(analysisData.semantic_fit_score * 100).toFixed(0)}%
-                    </span>
-                  )}
-                </h2>
-                <p className="text-sm" style={{ color: 'rgba(201,168,76,0.8)' }}>Showing AI intelligence output.</p>
+                <h2 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--accent-gold)' }}>Analysis Results</h2>
+                <p className="text-sm" style={{ color: 'rgba(201,168,76,0.8)' }}>Direct compatibility check</p>
               </div>
               <button
-                className="px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="px-4 py-2 rounded-md text-sm font-medium transition-colors w-full sm:w-auto"
                 style={{
                   background: 'transparent',
                   border: '1.5px solid rgba(201,168,76,0.55)',
                   color: '#C9A84C',
-                  boxShadow: '0 4px 16px rgba(201,168,76,0.12)',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(201,168,76,0.08)'
-                  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.85)'
-                  e.currentTarget.style.color = '#F0C040'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.borderColor = 'rgba(201,168,76,0.55)'
-                  e.currentTarget.style.color = '#C9A84C'
                 }}
                 onClick={() => {
                   setShowResults(false)
                   setFile(null)
                   setRole('')
+                  setJobDescription('')
                   setAnalysisData(null)
                 }}
               >
                 New Analysis
               </button>
             </div>
-            <ResultsDashboard data={analysisData} />
+
+            <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
+              <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
+                <CardContent className="pt-6 flex justify-center">
+                  {renderScoreCircle("Overall Match\nScore", analysisData?.overall_score)}
+                </CardContent>
+              </Card>
+              <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
+                <CardContent className="pt-6 flex justify-center">
+                  {renderScoreCircle("Keyword\nMatch", analysisData?.keyword_match_score)}
+                </CardContent>
+              </Card>
+              <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
+                <CardContent className="pt-6 flex justify-center">
+                  {renderScoreCircle("Experience\nRelevance", analysisData?.experience_relevance_score)}
+                </CardContent>
+              </Card>
+              <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
+                <CardContent className="pt-6 flex justify-center">
+                  {renderScoreCircle("ATS\nCompliance", analysisData?.ats_compliance_score)}
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Matched Keywords */}
+              <Card className="border" style={{ borderColor: 'rgba(34,197,94,0.3)' }}>
+                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(34,197,94,0.1)', background: 'rgba(34,197,94,0.05)' }}>
+                  <CardTitle className="text-base flex items-center text-green-500">
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> Matched Keywords
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="flex flex-wrap gap-2">
+                    {(!analysisData?.matched_keywords || analysisData.matched_keywords.length === 0) ? (
+                      <span className="text-sm text-green-600/60 italic">No exact matches found.</span>
+                    ) : (
+                      analysisData.matched_keywords.map((kw, i) => (
+                        <span key={i} className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400 border border-green-500/20 shadow-sm">
+                          {kw}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Missing Keywords */}
+              <Card className="border" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(239,68,68,0.1)', background: 'rgba(239,68,68,0.05)' }}>
+                  <CardTitle className="text-base flex items-center text-red-500">
+                    <XCircle className="w-4 h-4 mr-2" /> Missing Keywords
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <div className="flex flex-wrap gap-2">
+                    {(!analysisData?.missing_keywords || analysisData.missing_keywords.length === 0) ? (
+                      <span className="text-sm text-red-600/60 italic">No missing keywords!</span>
+                    ) : (
+                      analysisData.missing_keywords.map((kw, i) => (
+                        <span key={i} className="px-2.5 py-1 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm">
+                          {kw}
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Improvement Suggestions */}
+            {analysisData?.improvement_suggestions && analysisData.improvement_suggestions.length > 0 && (
+              <Card className="border" style={{ borderColor: 'rgba(201,168,76,0.3)' }}>
+                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.05)' }}>
+                  <CardTitle className="text-base flex items-center" style={{ color: 'var(--accent-gold)' }}>
+                    <Target className="w-4 h-4 mr-2" /> Resume Target Feedback
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ul className="space-y-3">
+                    {analysisData.improvement_suggestions.map((s, i) => (
+                      <li key={i} className="flex items-start text-sm" style={{ color: 'rgba(201,168,76,0.9)' }}>
+                        <span className="mr-2 mt-0.5" style={{ color: 'var(--accent-gold)' }}>•</span>
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            )}
+
           </motion.div>
         )}
       </AnimatePresence>

@@ -6,7 +6,7 @@ import EtherXTemplate from "./EtherXTemplate";
 
 /* ─────────────────────────────────────────────────────────
    TEMPLATE REGISTRY
-   Add new templates here — everything else auto-updates
+   All templates are ATS-optimized (v2)
 ───────────────────────────────────────────────────────── */
 export const TEMPLATES = [
   {
@@ -51,7 +51,6 @@ export const TEMPLATES = [
   },
 ];
 
-/* Used by ResumeBuilder to render the selected template */
 export default function SelectedTemplate({ data, templateId }) {
   const found = TEMPLATES.find(t => t.id === templateId);
   const Component = found ? found.component : ClassicTemplate;

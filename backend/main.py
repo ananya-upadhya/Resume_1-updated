@@ -8,7 +8,9 @@ import io
 import os
 import uuid
 import tempfile
-from fastapi import FastAPI
+import re
+import pypdf
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -451,5 +453,87 @@ async def export_docx(data: ResumeData):
         headers={"Content-Disposition":
                  f'attachment; filename="{p.name or "resume"}_{tid}_resume.docx"'}
     )
+
+@app.post("/api/analyze")
+async def analyze_resume(
+    role: str = Form(""),
+    job_description: str = Form(""),
+    file: UploadFile = File(...)
+):
+    try:
+        text = ""
+        if file.filename.lower().endswith(".pdf"):
+            reader = pypdf.PdfReader(file.file)
+            for page in reader.pages:
+                text += page.extract_text() + "\n"
+        elif file.filename.lower().endswith(".docx"):
+            from docx import Document
+            doc = Document(file.file)
+            text = "\n".join([para.text for para in doc.paragraphs])
+        else:
+            raise HTTPException(status_code=400, detail="Invalid file format")
+        text = text.lower()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not parse file: {str(e)}")
+
+    STOPWORDS = {"a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as", "at", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "can't", "cannot", "could", "couldn't", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during", "each", "few", "for", "from", "further", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he'd", "he'll", "he's", "her", "here", "here's", "hers", "herself", "him", "himself", "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in", "into", "is", "isn't", "it", "it's", "its", "itself", "let's", "me", "more", "most", "mustn't", "my", "myself", "no", "nor", "not", "of", "off", "on", "once", "only", "or", "other", "ought", "our", "ours", "ourselves", "out", "over", "own", "same", "shan't", "she", "she'd", "she'll", "she's", "should", "shouldn't", "so", "some", "such", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's", "these", "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too", "under", "until", "up", "very", "was", "wasn't", "we", "we'd", "we'll", "we're", "we've", "were", "weren't", "what", "what's", "when", "when's", "where", "where's", "which", "while", "who", "who's", "whom", "why", "why's", "with", "won't", "would", "wouldn't", "you", "you'd", "you'll", "you're", "you've", "your", "yours", "yourself", "yourselves", "experience", "role", "team", "work", "skills", "knowledge", "years", "working"}
+
+    # Extract keywords from JD
+    jd_words = re.findall(r'[a-zA-Z0-9+#]+', job_description.lower())
+    potential_keywords = set()
+    for w in jd_words:
+        if len(w) > 2 and w not in STOPWORDS and not w.isnumeric():
+            potential_keywords.add(w)
+
+    matched_keywords = []
+    missing_keywords = []
+    
+    for kw in potential_keywords:
+        if re.search(rf'\b{re.escape(kw)}\b', text):
+            matched_keywords.append(kw)
+        elif kw in text:
+            matched_keywords.append(kw)
+        else:
+            missing_keywords.append(kw)
+
+    total_kw = len(potential_keywords)
+    matched_count = len(matched_keywords)
+    
+    keyword_match_score = (matched_count / total_kw * 100) if total_kw > 0 else 0
+    skill_alignment_score = min(keyword_match_score * 1.1, 100)
+    
+    action_verbs = ["developed", "managed", "led", "created", "built", "designed", "improved", "increased", "reduced", "delivered", "implemented", "achieved"]
+    verbs_found = sum(1 for v in action_verbs if re.search(rf'\b{v}\b', text))
+    experience_relevance_score = min(50 + (verbs_found * 10), 100)
+    
+    headers = ["experience", "education", "skills", "projects", "summary"]
+    headers_found = sum(1 for h in headers if re.search(rf'\b{h}\b', text))
+    ats_compliance_score = (headers_found / len(headers)) * 100
+    
+    if total_kw == 0:
+        overall_score = (experience_relevance_score * 0.5) + (ats_compliance_score * 0.5)
+    else:
+        overall_score = (keyword_match_score * 0.4) + (skill_alignment_score * 0.3) + (experience_relevance_score * 0.2) + (ats_compliance_score * 0.1)
+        
+    improvement_suggestions = []
+    if missing_keywords:
+        improvement_suggestions.append(f"Consider adding missing keywords like: {', '.join(list(missing_keywords)[:5])}")
+    if verbs_found < 3:
+        improvement_suggestions.append("Use more action verbs (e.g. Led, Developed, Improved) to describe experiences.")
+    if headers_found < 3:
+        improvement_suggestions.append("Ensure your resume has standard sections like Experience, Education, and Skills.")
+    if not re.search(r'\b\d+%\b|\b\$\d+\b', text):
+        improvement_suggestions.append("Add quantifiable achievements (e.g. increased sales by 20%, saved $10k).")
+        
+    return {
+        "overall_score": overall_score,
+        "keyword_match_score": keyword_match_score,
+        "matched_keywords": matched_keywords,
+        "missing_keywords": missing_keywords,
+        "skill_alignment_score": skill_alignment_score,
+        "experience_relevance_score": experience_relevance_score,
+        "ats_compliance_score": ats_compliance_score,
+        "improvement_suggestions": improvement_suggestions
+    }
 
 # uvicorn main:app --reload --port 5000

@@ -1,26 +1,9 @@
 import { Outlet, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Sidebar } from './Sidebar'
-import { useState, useEffect } from 'react'
-import { Sun, Moon } from 'lucide-react'
 
 export function Layout() {
   const location = useLocation()
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem('theme') || 'dark'
-  })
-
-  useEffect(() => {
-    const root = document.documentElement
-    if (theme === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
-    localStorage.setItem('theme', theme)
-  }, [theme])
-
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark')
 
   return (
     <div
@@ -53,31 +36,6 @@ export function Layout() {
             flexShrink: 0,
           }}
         >
-          <button
-            onClick={toggleTheme}
-            title="Toggle theme"
-            style={{
-              padding: '6px',
-              borderRadius: '9999px',
-              border: '1px solid rgba(201,168,76,0.25)',
-              background: 'transparent',
-              color: 'rgba(201,168,76,0.7)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              transition: 'all 0.2s',
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.background = 'rgba(201,168,76,0.1)'
-              e.currentTarget.style.color = '#C9A84C'
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.background = 'transparent'
-              e.currentTarget.style.color = 'rgba(201,168,76,0.7)'
-            }}
-          >
-            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
         </header>
 
         {/* ─── Page Content ─────────────────────────────────────── */}
