@@ -1514,6 +1514,8 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
       showBanner("loading", "Generating PDF…", 30000);
       const isMobileHidden = window.innerWidth <= 600 && mobTab !== "preview";
       const originalTab = mobTab;
+      const isMobile = window.innerWidth <= 800;
+      let originalCssText = "";
 
       try {
         if (isMobileHidden) {
@@ -1524,12 +1526,21 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
         const el = document.getElementById("resume-output");
         if (!el) throw new Error("Resume preview not found.");
 
+        if (isMobile) {
+          originalCssText = el.style.cssText;
+          el.style.width = "610px";
+          el.style.minWidth = "610px";
+          el.style.maxWidth = "610px";
+          el.style.padding = "2.2rem 2.4rem";
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
+
         const html2canvasModule = await import("html2canvas");
         const html2canvas = html2canvasModule.default ? html2canvasModule.default : html2canvasModule;
         const jsPDFModule = await import("jspdf");
         const jsPDF = jsPDFModule.jsPDF ? jsPDFModule.jsPDF : jsPDFModule.default;
 
-        const canvas = await html2canvas(el, {
+        const html2Options = {
           scale: 2,
           useCORS: true,
           backgroundColor: "#ffffff",
@@ -1539,8 +1550,22 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
           ignoreElements: (el) =>
             el.classList?.contains("rb-prev-bar") ||
             el.classList?.contains("rb-tabbar"),
+        };
 
-        });
+        if (isMobile) {
+          html2Options.windowWidth = 1024;
+          html2Options.onclone = (doc) => {
+            const clonedEl = doc.getElementById("resume-output");
+            if (clonedEl) {
+              clonedEl.style.width = "610px";
+              clonedEl.style.minWidth = "610px";
+              clonedEl.style.maxWidth = "610px";
+              clonedEl.style.padding = "2.2rem 2.4rem";
+            }
+          };
+        }
+
+        const canvas = await html2canvas(el, html2Options);
 
         const imgData = canvas.toDataURL("image/jpeg", 0.82);
         const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
@@ -1561,6 +1586,10 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
       } catch (err) {
         showBanner("error", err.message || "PDF export failed.");
       } finally {
+        if (isMobile) {
+          const el = document.getElementById("resume-output");
+          if (el) el.style.cssText = originalCssText;
+        }
         if (isMobileHidden) {
           setMobTab(originalTab);
         }
