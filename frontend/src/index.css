@@ -122,14 +122,14 @@ body,
 /* ─── Mobile Layout Fixes (≤ 768px) ─────────────────────────────── */
 @media (max-width: 768px) {
 
-  /* 1. Hide the sidebar completely */
-  aside {
+  /* 1. Hide the sidebar completely, except in builder */
+  aside:not(.rb-sidebar) {
     display: none !important;
   }
 
   /* 2. Outer layout wrapper — switch from row to column */
-  body > #root > div,
-  #root > div {
+  body>#root>div,
+  #root>div {
     flex-direction: column !important;
   }
 
@@ -142,7 +142,7 @@ body,
   }
 
   /* 4. Page content padding wrapper — 1rem instead of 2rem */
-  main > div > div[style] {
+  main>div>div[style] {
     padding: 1rem !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
@@ -168,7 +168,7 @@ body,
   }
 
   /* Score circles grid — 2-up on mobile is fine, override col-span */
-  .analyze-page-container .grid > * {
+  .analyze-page-container .grid>* {
     grid-column: span 1 !important;
   }
 
@@ -185,14 +185,19 @@ body,
 }
 
 /* ─── Word-break for all headings (all viewports) ──────────────── */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
 /* ─── Extra-small screens (≤ 480px) — tighten padding further ──── */
 @media (max-width: 480px) {
-  main > div > div[style] {
+  main>div>div[style] {
     padding: 0.75rem !important;
   }
 

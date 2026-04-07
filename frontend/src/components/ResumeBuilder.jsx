@@ -1,9 +1,8 @@
+'use client';
 import { useState, useEffect, useRef } from "react";
 import ATSPanel from "./ATSPanel";
 import { ENHANCERS } from "../groqHelper";
 import SelectedTemplate from "../templates/index.jsx";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
 const API = API_BASE.replace(/\/api$/, "").replace(/\/$/, "");
@@ -1503,6 +1502,8 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
   };
 
   const handleExport = async type => {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    
     if (!data.personal.name.trim()) {
       showBanner("error", "Please fill in your name before exporting.");
       return;
@@ -1511,9 +1512,22 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
 
     if (type === "pdf") {
       showBanner("loading", "Generating PDF…", 30000);
+      const isMobileHidden = window.innerWidth <= 600 && mobTab !== "preview";
+      const originalTab = mobTab;
+
       try {
+        if (isMobileHidden) {
+          setMobTab("preview");
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+
         const el = document.getElementById("resume-output");
         if (!el) throw new Error("Resume preview not found.");
+
+        const html2canvasModule = await import("html2canvas");
+        const html2canvas = html2canvasModule.default ? html2canvasModule.default : html2canvasModule;
+        const jsPDFModule = await import("jspdf");
+        const jsPDF = jsPDFModule.jsPDF ? jsPDFModule.jsPDF : jsPDFModule.default;
 
         const canvas = await html2canvas(el, {
           scale: 2,
@@ -1547,6 +1561,9 @@ export default function ResumeBuilder({ templateId = "classic", onBack }) {
       } catch (err) {
         showBanner("error", err.message || "PDF export failed.");
       } finally {
+        if (isMobileHidden) {
+          setMobTab(originalTab);
+        }
         setExporting(false);
       }
 
