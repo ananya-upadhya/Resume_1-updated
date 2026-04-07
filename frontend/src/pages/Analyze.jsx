@@ -105,7 +105,68 @@ export default function Analyze() {
   }
 
   return (
-    <div className="space-y-8 pb-12 max-w-5xl mx-auto">
+    <div className="analyze-page-container space-y-8 pb-12 max-w-5xl mx-auto">
+      <style>{`
+        /* ─── Mobile Layout Overrides (Max 768px) ─── */
+        @media (max-width: 768px) {
+          /* 1. Hide Sidebar Completely */
+          aside { display: none !important; }
+          
+          /* 2 & 3. Main Content Area 100% Width & Single Column */
+          main { 
+            width: 100% !important; 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            flex-direction: column !important;
+          }
+          
+          /* 7. Padding and margins — 1rem on all sides instead of larger desktop */
+          main > div > div, .analyze-page-container { 
+            padding: 1rem !important; 
+            box-sizing: border-box !important;
+          }
+          
+          /* 5. Upload area 100% width, min-height 200px */
+          .upload-drop-zone {
+            width: 100% !important;
+            min-height: 200px !important;
+            padding: 1rem !important;
+            box-sizing: border-box !important;
+          }
+        }
+        
+        /* 4. Text wrapping for all textual elements */
+        .analyze-page-container h1, 
+        .analyze-page-container h2, 
+        .analyze-page-container h3, 
+        .analyze-page-container p, 
+        .analyze-page-container span,
+        .analyze-page-container div {
+          word-break: break-word;
+          overflow-wrap: break-word;
+        }
+
+        /* 6. Font sizes below 480px */
+        @media (max-width: 480px) {
+          .analyze-page-container h1, 
+          .analyze-page-container h2, 
+          .analyze-page-container h3,
+          .analyze-page-container .text-xl,
+          .analyze-page-container .text-2xl,
+          .analyze-page-container .text-3xl {
+            font-size: 1.4rem !important;
+            line-height: 1.3 !important;
+          }
+          .analyze-page-container p, 
+          .analyze-page-container span,
+          .analyze-page-container .text-sm,
+          .analyze-page-container .text-xs,
+          .analyze-page-container .text-base {
+            font-size: 0.8rem !important; /* Min 0.8rem */
+            line-height: 1.4 !important;
+          }
+        }
+      `}</style>
       <div>
         <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Analyze Resume</h1>
         <p className="mt-2 text-sm md:text-base" style={{ color: 'rgba(201,168,76,0.8)' }}>
@@ -129,7 +190,7 @@ export default function Analyze() {
                 <div
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-xl p-8 md:p-12 text-center transition-colors flex flex-col items-center justify-center ${
+                  className={`upload-drop-zone border-2 border-dashed rounded-xl p-8 md:p-12 text-center transition-colors flex flex-col items-center justify-center ${
                     file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
                   }`}
                   style={{ borderColor: file ? 'var(--accent-gold)' : 'rgba(201,168,76,0.3)', backgroundColor: file ? 'rgba(201,168,76,0.05)' : 'transparent' }}

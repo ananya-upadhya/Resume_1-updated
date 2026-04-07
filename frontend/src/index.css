@@ -105,13 +105,99 @@ body,
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: var(--border-color);
   border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-secondary);
+}
+
+/* ─── Mobile Layout Fixes (≤ 768px) ─────────────────────────────── */
+@media (max-width: 768px) {
+
+  /* 1. Hide the sidebar completely */
+  aside {
+    display: none !important;
+  }
+
+  /* 2. Outer layout wrapper — switch from row to column */
+  body > #root > div,
+  #root > div {
+    flex-direction: column !important;
+  }
+
+  /* 3. Main content area — full width, reset margins */
+  main {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    margin: 0 !important;
+  }
+
+  /* 4. Page content padding wrapper — 1rem instead of 2rem */
+  main > div > div[style] {
+    padding: 1rem !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 5. Upload / drag-drop zone — full width */
+  .upload-drop-zone {
+    width: 100% !important;
+    min-height: 180px !important;
+    padding: 1rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 6. Any explicit flex-row containers inside the page — stack vertically */
+  .analyze-page-container .flex,
+  .analyze-page-container [class*="flex-row"] {
+    flex-direction: column !important;
+  }
+
+  /* 7. Grid columns — force single column on mobile */
+  .analyze-page-container .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Score circles grid — 2-up on mobile is fine, override col-span */
+  .analyze-page-container .grid > * {
+    grid-column: span 1 !important;
+  }
+
+  /* 8. "New Analysis" / action buttons — full width */
+  .analyze-page-container button[class*="w-full"],
+  .analyze-page-container .flex.justify-end {
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+
+  .analyze-page-container .flex.justify-end button {
+    width: 100% !important;
+  }
+}
+
+/* ─── Word-break for all headings (all viewports) ──────────────── */
+h1, h2, h3, h4, h5, h6 {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ─── Extra-small screens (≤ 480px) — tighten padding further ──── */
+@media (max-width: 480px) {
+  main > div > div[style] {
+    padding: 0.75rem !important;
+  }
+
+  .upload-drop-zone {
+    padding: 0.75rem !important;
+    min-height: 160px !important;
+  }
 }
