@@ -3,7 +3,7 @@ const ANALYZE_API = ANALYZE_API_BASE.replace(/\/api$/, "").replace(/\/$/, "");
 
 async function callGroq(systemPrompt, userPrompt) {
     // Guard against empty prompts
-    if (!userPrompt || userPrompt.trim().length < 5) {
+    if (!userPrompt || userPrompt.trim().length < 2) {
         throw new Error("Input too short");
     }
 

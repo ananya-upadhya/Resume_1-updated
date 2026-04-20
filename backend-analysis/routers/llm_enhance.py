@@ -31,7 +31,7 @@ async def enhance_text(request: EnhanceRequest):
     Accepts a system_prompt + user_prompt, returns the LLM's text response.
     Falls back gracefully when LLM is unavailable.
     """
-    if not request.user_prompt or len(request.user_prompt.strip()) < 3:
+    if not request.user_prompt or len(request.user_prompt.strip()) < 2:
         raise HTTPException(status_code=400, detail="user_prompt too short")
 
     if not settings.USE_LLM:
