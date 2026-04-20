@@ -185,123 +185,211 @@ const STYLES = `
 /* Mini preview components for thumbnails */
 function MiniClassic() {
   return (
-    <div style={{ padding: "1.5rem 1.8rem", fontFamily: "serif", background: "#fff", minHeight: "400px" }}>
-      <div style={{ textAlign: "center", borderBottom: "1.5px solid #0a0a0a", paddingBottom: "1rem", marginBottom: "1rem" }}>
-        <div style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: ".08em", color: "#0a0a0a" }}>JOHN DOE</div>
-        <div style={{ fontSize: ".55rem", letterSpacing: ".18em", textTransform: "uppercase", color: "#555", marginTop: ".2rem" }}>Software Engineer</div>
-        <div style={{ fontSize: ".45rem", color: "#888", marginTop: ".3rem" }}>john@email.com · +91 98765 43210 · Bengaluru</div>
+    <div style={{ display: "flex", fontFamily: "serif", background: "#fff", minHeight: "400px" }}>
+      {/* Sidebar (Left 30%) */}
+      <div style={{ width: "30%", background: "#f9f9f9", padding: "1.2rem .8rem", borderRight: "1px solid #eee" }}>
+        <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".1em", color: "#111", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2px", marginBottom: "6px" }}>Education</div>
+        <div style={{ fontSize: ".38rem", fontWeight: 700, color: "#111" }}>B.Tech CS</div>
+        <div style={{ fontSize: ".32rem", color: "#666", marginBottom: "12px" }}>2018 - 2022</div>
+        <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".1em", color: "#111", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2px", marginBottom: "6px" }}>Skills</div>
+        {["React", "Python", "SQL", "Docker"].map(s => <div key={s} style={{ fontSize: ".35rem", color: "#333", marginBottom: "3px" }}>• {s}</div>)}
       </div>
-      {["SUMMARY", "EXPERIENCE", "EDUCATION", "SKILLS"].map(s => (
-        <div key={s} style={{ marginBottom: ".7rem" }}>
-          <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".2em", color: "#0a0a0a", borderBottom: "1px solid #ccc", paddingBottom: ".1rem", marginBottom: ".3rem" }}>{s}</div>
-          <div style={{ fontSize: ".4rem", color: "#555", lineHeight: 1.5 }}>{'— '.repeat(s === "SKILLS" ? 8 : 1)}{s !== "SKILLS" && "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod."}</div>
-          {s === "EXPERIENCE" && <><div style={{ fontSize: ".4rem", color: "#333", marginTop: ".2rem", fontWeight: 600 }}>Senior Developer · TechCorp</div><div style={{ fontSize: ".38rem", color: "#666" }}>Jan 2022 – Present</div></>}
+      {/* Main Column */}
+      <div style={{ flex: 1, padding: "1.2rem 1rem" }}>
+        <div style={{ borderBottom: "1.5px solid #111", paddingBottom: "8px", marginBottom: "15px" }}>
+          <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#111", letterSpacing: "-0.02em" }}>JOHN DOE</div>
+          <div style={{ fontSize: ".55rem", color: "#888", fontWeight: 500, marginTop: "2px" }}>Software Engineer</div>
         </div>
-      ))}
+        <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".05em", color: "#111", textTransform: "uppercase", borderBottom: "1px solid #ccc", paddingBottom: "2px", marginBottom: "8px" }}>Experience</div>
+        <div style={{ marginBottom: "10px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div style={{ fontSize: ".45rem", fontWeight: 700, color: "#111" }}>Senior Developer</div>
+            <div style={{ fontSize: ".35rem", color: "#888" }}>2022 - Present</div>
+          </div>
+          <div style={{ fontSize: ".4rem", color: "#111", fontStyle: "italic" }}>TechCorp</div>
+          <div style={{ fontSize: ".38rem", color: "#444", marginTop: "4px", lineHeight: 1.4 }}>Participated in full-cycle software development and system architecture design.</div>
+        </div>
+      </div>
     </div>
   );
 }
 function MiniModern() {
   return (
-    <div style={{ display: "flex", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
-      <div style={{ width: "38%", background: "#eff6ff", padding: "1.2rem .8rem", borderRight: "1px solid #dbeafe" }}>
-        <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".15em", color: "#2563eb", textTransform: "uppercase", marginBottom: ".4rem" }}>Contact</div>
-        {["email", "phone", "location", "linkedin"].map(c => <div key={c} style={{ fontSize: ".38rem", color: "#334155", marginBottom: ".2rem" }}>● {c}@info.com</div>)}
-        <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".15em", color: "#2563eb", textTransform: "uppercase", margin: ".6rem 0 .3rem" }}>Skills</div>
-        {["React", "Python", "Node.js", "AWS", "Docker"].map(s => <div key={s} style={{ fontSize: ".38rem", color: "#1e293b", marginBottom: ".18rem" }}>● {s}</div>)}
+    <div style={{ display: "flex", flexDirection: "column", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
+      <div style={{ background: "#2563eb", padding: "1.2rem 1.4rem", color: "#fff" }}>
+        <div style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: ".06em" }}>JOHN DOE</div>
+        <div style={{ fontSize: ".42rem", fontWeight: 500, letterSpacing: ".15em", textTransform: "uppercase", opacity: 0.85, marginTop: "2px" }}>SOFTWARE ENGINEER</div>
       </div>
-      <div style={{ flex: 1, padding: "1.2rem 1rem" }}>
-        <div style={{ background: "#2563eb", padding: ".8rem", marginBottom: ".8rem", borderRadius: "4px" }}>
-          <div style={{ fontSize: ".9rem", fontWeight: 700, color: "#fff", letterSpacing: ".05em" }}>JOHN DOE</div>
-          <div style={{ fontSize: ".42rem", color: "rgba(255,255,255,.7)", marginTop: ".15rem", letterSpacing: ".15em" }}>SOFTWARE ENGINEER</div>
+      <div style={{ display: "flex", flex: 1 }}>
+        <div style={{ width: "36%", background: "#eff6ff", padding: "1rem .8rem" }}>
+          <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".1em", color: "#2563eb", textTransform: "uppercase", marginBottom: "6px" }}>Contact</div>
+          {["email", "phone", "location"].map(c => <div key={c} style={{ fontSize: ".34rem", color: "#334155", marginBottom: "3px" }}>● {c}</div>)}
+          <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".1em", color: "#2563eb", textTransform: "uppercase", margin: "10px 0 6px" }}>Skills</div>
+          {["React", "Node.js", "Python"].map(s => <div key={s} style={{ display: "flex", alignItems: "center", gap: "3px", marginBottom: "2px" }}>
+            <div style={{ width: "3px", height: "3px", borderRadius: "50%", background: "#2563eb" }} />
+            <span style={{ fontSize: ".35rem", color: "#1e293b" }}>{s}</span>
+          </div>)}
         </div>
-        {["EXPERIENCE", "PROJECTS"].map(s => (
-          <div key={s} style={{ marginBottom: ".6rem" }}>
-            <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".14em", color: "#2563eb", borderBottom: "2px solid #2563eb", paddingBottom: ".1rem", marginBottom: ".3rem" }}>{s}</div>
-            <div style={{ fontSize: ".4rem", color: "#334155", lineHeight: 1.5 }}>Lorem ipsum dolor sit amet consectetur adipiscing elit.</div>
+        <div style={{ flex: 1, padding: "1rem" }}>
+          <div style={{ borderBottom: "2px solid #2563eb", paddingBottom: "2px", marginBottom: "8px" }}>
+            <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".1em", color: "#2563eb", textTransform: "uppercase" }}>Work Experience</div>
           </div>
-        ))}
+          <div style={{ marginBottom: "8px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div style={{ fontSize: ".45rem", fontWeight: 700, color: "#0f172a" }}>Senior Role</div>
+              <div style={{ fontSize: ".32rem", color: "#94a3b8" }}>Present</div>
+            </div>
+            <div style={{ fontSize: ".38rem", color: "#2563eb", fontWeight: 500 }}>Company Name</div>
+            <div style={{ fontSize: ".35rem", color: "#475569", marginTop: "3px" }}>▸ Led cross-functional teams to deliver scaleable solutions.</div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 function MiniTech() {
   return (
-    <div style={{ padding: "1.2rem 1.4rem", fontFamily: "monospace", background: "#fff", minHeight: "400px" }}>
-      <div style={{ borderLeft: "4px solid #16a34a", paddingLeft: ".8rem", marginBottom: "1rem" }}>
-        <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#0f172a" }}>john_doe</div>
-        <div style={{ fontSize: ".48rem", color: "#16a34a", marginTop: ".1rem" }}>{"> Software Engineer"}</div>
-      </div>
-      <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "4px", padding: ".4rem .6rem", marginBottom: ".8rem" }}>
-        <span style={{ fontSize: ".38rem", color: "#16a34a", fontWeight: 700 }}>email:</span><span style={{ fontSize: ".38rem", color: "#334155" }}> john@dev.io </span>
-        <span style={{ fontSize: ".38rem", color: "#16a34a", fontWeight: 700 }}>github:</span><span style={{ fontSize: ".38rem", color: "#334155" }}> github.com/john </span>
-      </div>
-      {["// experience", "// projects", "// skills"].map(s => (
-        <div key={s} style={{ marginBottom: ".6rem" }}>
-          <div style={{ fontSize: ".42rem", fontWeight: 700, color: "#16a34a", marginBottom: ".25rem" }}>{s}</div>
-          <div style={{ fontSize: ".38rem", color: "#334155", lineHeight: 1.5 }}>{"→ "} Lorem ipsum dolor sit amet consectetur.</div>
-          {s === "// skills" && <div style={{ display: "flex", flexWrap: "wrap", gap: ".2rem", marginTop: ".2rem" }}>{["React", "Python", "Docker", "AWS"].map(sk => <span key={sk} style={{ fontSize: ".35rem", background: "#f1f5f9", border: "1px solid #cbd5e1", padding: ".08rem .3rem", borderRadius: "3px" }}>{sk}</span>)}</div>}
+    <div style={{ display: "flex", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
+      {/* Navy Sidebar (35%) */}
+      <div style={{ width: "35%", background: "#1A2B3C", color: "#fff", padding: "1.5rem 1rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <div style={{ width: "40px", height: "40px", background: "#C9A84C", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}>
+          <span style={{ fontSize: ".8rem", fontWeight: 700, color: "#1A2B3C" }}>JD</span>
         </div>
-      ))}
+        <div style={{ textAlign: "center", marginBottom: "15px" }}>
+          <div style={{ fontSize: ".8rem", fontWeight: 700, color: "#fff", lineHeight: 1.1 }}>JOHN DOE</div>
+          <div style={{ fontSize: ".38rem", color: "#C9A84C", fontWeight: 500, marginTop: "3px" }}>Tech Expert</div>
+        </div>
+        <div style={{ width: "100%", fontSize: ".32rem", display: "flex", flexDirection: "column", gap: "4px" }}>
+          <div style={{ display: "flex", gap: "5px" }}><span style={{ color: "#C9A84C" }}>EM</span><span>john@dev.io</span></div>
+          <div style={{ display: "flex", gap: "5px" }}><span style={{ color: "#C9A84C" }}>GIT</span><span>github.com/jd</span></div>
+        </div>
+        <div style={{ width: "100%", marginTop: "15px" }}>
+          <div style={{ fontSize: ".35rem", color: "#C9A84C", fontWeight: 700, textTransform: "uppercase", borderBottom: "1px solid rgba(201,168,76,0.3)", paddingBottom: "2px", marginBottom: "5px" }}>Expertise</div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "3px" }}>
+            {["React", "AWS", "Python"].map(sk => <span key={sk} style={{ fontSize: ".28rem", background: "#0D2137", border: "1px solid #C9A84C", padding: "1px 3px", borderRadius: "2px" }}>{sk}</span>)}
+          </div>
+        </div>
+      </div>
+      {/* Main Column */}
+      <div style={{ width: "65%", padding: "1.5rem 1.2rem" }}>
+        <div style={{ marginBottom: "15px" }}>
+          <div style={{ fontSize: ".5rem", fontWeight: 800, color: "#C9A84C", textTransform: "uppercase", letterSpacing: ".05em" }}>Work Experience</div>
+          <div style={{ height: "1.5px", background: "linear-gradient(to right, #C9A84C, #14b8a6)", marginTop: "3px" }} />
+        </div>
+        <div style={{ marginBottom: "12px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ fontSize: ".48rem", fontWeight: 700, color: "#1A2B3C" }}>Senior Developer</div>
+            <div style={{ fontSize: ".32rem", color: "#666" }}>2022 - 2024</div>
+          </div>
+          <div style={{ fontSize: ".42rem", color: "#C9A84C", fontWeight: 600 }}>Google Cloud</div>
+          <div style={{ fontSize: ".38rem", color: "#333", marginTop: "4px", lineHeight: 1.4 }}>• Developed cloud-native infrastructure using Kubernetes.</div>
+        </div>
+      </div>
     </div>
   );
 }
 function MiniExecutive() {
   return (
-    <div style={{ fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
-      <div style={{ background: "#1e3a5f", padding: "1.2rem 1.4rem" }}>
-        <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", letterSpacing: ".06em" }}>JOHN DOE</div>
-        <div style={{ fontSize: ".45rem", color: "rgba(255,255,255,.65)", letterSpacing: ".18em", textTransform: "uppercase", marginTop: ".2rem" }}>Chief Technology Officer</div>
-        <div style={{ fontSize: ".38rem", color: "rgba(255,255,255,.5)", marginTop: ".35rem" }}>john@corp.com · +91 98765 43210 · Mumbai, India</div>
-      </div>
-      <div style={{ height: "3px", background: "linear-gradient(90deg,#b8860b,#daa520,#b8860b)" }} />
-      <div style={{ padding: "1rem 1.4rem" }}>
-        {["Executive Summary", "Professional Experience", "Core Competencies"].map(s => (
-          <div key={s} style={{ marginBottom: ".7rem" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: ".3rem", marginBottom: ".25rem" }}>
-              <div style={{ width: "3px", height: "10px", background: "#b8860b", borderRadius: "2px" }} />
-              <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: "#1e3a5f" }}>{s}</div>
-            </div>
-            <div style={{ fontSize: ".38rem", color: "#4a5568", lineHeight: 1.6, borderLeft: "2px solid #fef3c7", paddingLeft: ".5rem" }}>Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor.</div>
+    <div style={{ display: "flex", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
+      {/* Sidebar (35%) */}
+      <div style={{ width: "35%", background: "#F3F3F3", padding: "1.2rem 1rem", borderRight: "1px solid #D1D5DB" }}>
+        <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".1em", color: "#111", textTransform: "uppercase", borderBottom: "1.5px solid #111", paddingBottom: "2px", marginBottom: "8px" }}>About Me</div>
+        <div style={{ fontSize: ".34rem", color: "#444", lineHeight: 1.5, marginBottom: "15px" }}>Senior strategist with a track record of driving corporate growth.</div>
+        <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".1em", color: "#111", textTransform: "uppercase", borderBottom: "1.5px solid #111", paddingBottom: "2px", marginBottom: "8px" }}>Skills</div>
+        {["Strategy", "Leadership", "Finance"].map((s, i) => <div key={s} style={{ marginBottom: "5px" }}>
+          <div style={{ fontSize: ".34rem", fontWeight: 600, color: "#333", marginBottom: "2px" }}>{s}</div>
+          <div style={{ height: "3px", background: "#DDD", borderRadius: "2px", overflow: "hidden" }}>
+            <div style={{ background: "#111", height: "100%", width: i === 0 ? "90%" : i === 1 ? "80%" : "70%" }} />
           </div>
-        ))}
+        </div>)}
+      </div>
+      {/* Main Content (65%) */}
+      <div style={{ flex: 1, padding: "0" }}>
+        <div style={{ background: "#111", padding: "1.2rem", color: "#fff", marginBottom: "10px" }}>
+          <div style={{ fontSize: "1.2rem", fontWeight: 800, letterSpacing: ".05em", textTransform: "uppercase" }}>JOHN DOE</div>
+          <div style={{ fontSize: ".42rem", textTransform: "uppercase", letterSpacing: ".15em", opacity: 0.9, marginTop: "2px" }}>Chief Officer</div>
+        </div>
+        <div style={{ padding: "0.8rem 1.2rem" }}>
+          <div style={{ fontSize: ".42rem", fontWeight: 700, letterSpacing: ".1em", color: "#111", textTransform: "uppercase", borderBottom: "1.5px solid #111", paddingBottom: "2px", marginBottom: "10px" }}>Experience</div>
+          <div style={{ display: "flex", gap: "8px", position: "relative" }}>
+            <div style={{ width: "5px", height: "5px", borderRadius: "50%", border: "1.2px solid #111", background: "#fff", flexShrink: 0, marginTop: "3px" }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ fontSize: ".42rem", fontWeight: 700, color: "#111" }}>Executive Director</div>
+                <div style={{ fontSize: ".32rem", color: "#777" }}>2018 - PRESENT</div>
+              </div>
+              <div style={{ fontSize: ".38rem", color: "#555", fontWeight: 600 }}>Global Corp</div>
+              <div style={{ fontSize: ".35rem", color: "#555", marginTop: "3px" }}>• Optimized operational efficiency by 25%.</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 function MiniEtherX() {
   return (
-    <div style={{ fontFamily: "sans-serif", background: "#fff", minHeight: "400px", display: "flex", flexDirection: "column" }}>
-      <div style={{ padding: "1rem 1.2rem .8rem", borderBottom: "1px solid #ebebeb", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <div style={{ fontSize: "1rem", fontWeight: 700, fontFamily: "serif", color: "#0a0a0a", letterSpacing: ".06em" }}>JOHN DOE</div>
-          <div style={{ fontSize: ".42rem", color: "#A07830", fontWeight: 600, letterSpacing: ".12em", marginTop: ".1rem" }}>SOFTWARE ENGINEER</div>
-          <div style={{ fontSize: ".36rem", color: "#666", marginTop: ".2rem" }}>✉ john@email.com · 📞 +91 98765</div>
+    <div style={{ display: "flex", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
+      {/* Green Sidebar (32%) */}
+      <div style={{ width: "32%", background: "#1A3C34", color: "#fff", padding: "1.2rem .8rem", display: "flex", flexDirection: "column" }}>
+        <div style={{ width: "32px", height: "32px", background: "#C9A84C", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "10px" }}>
+          <span style={{ fontSize: ".6rem", fontWeight: 700, color: "#fff" }}>JD</span>
         </div>
-        <div style={{ width: "32px", height: "32px", borderRadius: "50%", border: "2px solid #C9A84C", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <span style={{ fontSize: ".5rem", fontWeight: 700, color: "#A07830", fontFamily: "serif" }}>JD</span>
+        <div style={{ fontSize: ".75rem", fontWeight: 700, color: "#fff", lineHeight: 1.1 }}>JOHN DOE</div>
+        <div style={{ fontSize: ".34rem", color: "#C9A84C", fontWeight: 500, fontStyle: "italic", marginTop: "2px", marginBottom: "12px" }}>Signature Pro</div>
+        <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".1em", color: "#C9A84C", textTransform: "uppercase", borderBottom: ".5px solid #C9A84C", paddingBottom: "2px", marginBottom: "5px" }}>Skills</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "3px", marginBottom: "10px" }}>
+          {["AI", "Data", "Cloud"].map(s => <span key={s} style={{ fontSize: ".28rem", background: "#2A5C4A", padding: "1px 3px", borderRadius: "2px" }}>{s}</span>)}
+        </div>
+        <div style={{ marginTop: "auto", borderTop: "1px solid rgba(201,168,76,0.3)", paddingTop: "5px", textAlign: "center" }}>
+          <span style={{ fontSize: ".25rem", color: "#C9A84C", letterSpacing: ".2em" }}>ETHERX</span>
         </div>
       </div>
-      <div style={{ display: "flex", flex: 1 }}>
-        <div style={{ flex: "0 0 62%", padding: ".6rem .8rem", borderRight: "1px solid #ebebeb", borderLeft: "3px solid #C9A84C" }}>
-          {["SUMMARY", "EXPERIENCE", "PROJECTS"].map(s => (
-            <div key={s} style={{ marginBottom: ".5rem" }}>
-              <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".18em", color: "#0a0a0a", borderBottom: "1px solid #e8d48a", paddingBottom: ".08rem", marginBottom: ".2rem" }}>{s}</div>
-              <div style={{ fontSize: ".35rem", color: "#444", lineHeight: 1.5 }}>Lorem ipsum dolor sit amet consectetur adipiscing elit.</div>
-            </div>
-          ))}
+      {/* Main Column */}
+      <div style={{ flex: 1, padding: "1.2rem 1.4rem" }}>
+        <div style={{ fontSize: ".45rem", fontWeight: 700, color: "#1A3C34", textTransform: "uppercase", borderBottom: "1px solid #C9A84C", paddingBottom: "2px", marginBottom: "10px" }}>Summary</div>
+        <div style={{ fontSize: ".38rem", lineHeight: 1.6, color: "#333", marginBottom: "15px" }}>Expert in delivering high-value technical architecture and strategy.</div>
+        <div style={{ fontSize: ".45rem", fontWeight: 700, color: "#1A3C34", textTransform: "uppercase", borderBottom: "1px solid #C9A84C", paddingBottom: "2px", marginBottom: "8px" }}>Experience</div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+          <div style={{ fontSize: ".4rem", fontWeight: 700, color: "#1A3C34" }}>Senior Lead</div>
+          <div style={{ fontSize: ".32rem", color: "#777" }}>2020 - Present</div>
         </div>
-        <div style={{ flex: "0 0 38%", padding: ".6rem .7rem", background: "#fff" }}>
-          {["SKILLS", "EDUCATION", "CERTIFICATIONS"].map(s => (
-            <div key={s} style={{ marginBottom: ".5rem" }}>
-              <div style={{ fontSize: ".38rem", fontWeight: 700, letterSpacing: ".18em", color: "#0a0a0a", borderBottom: "1.5px solid #C9A84C", paddingBottom: ".08rem", marginBottom: ".2rem" }}>{s}</div>
-              <div style={{ fontSize: ".35rem", color: "#444", lineHeight: 1.5 }}>
-                {s === "SKILLS"
-                  ? <div style={{ display: "flex", flexWrap: "wrap", gap: ".15rem" }}>{["React", "Python", "SQL"].map(sk => <span key={sk} style={{ background: "#fdf8ee", border: "1px solid #e8d48a", borderRadius: "3px", padding: ".05rem .2rem", fontSize: ".32rem" }}>{sk}</span>)}</div>
-                  : "Lorem ipsum dolor sit."}
-              </div>
-            </div>
-          ))}
+        <div style={{ fontSize: ".34rem", color: "#C9A84C", fontWeight: 600 }}>EtherX Solutions</div>
+      </div>
+    </div>
+  );
+}
+
+function MiniStudent() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", fontFamily: "sans-serif", background: "#fff", minHeight: "400px" }}>
+      {/* Header */}
+      <div style={{ padding: "1.2rem 1.4rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#2d2d2d", textTransform: "uppercase" }}>JOHN DOE</div>
+          <div style={{ fontSize: ".45rem", color: "#C85A38", fontWeight: 600, letterSpacing: ".1em", marginTop: "2px" }}>SOFTWARE INTERN</div>
+        </div>
+        <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#C85A38", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ fontSize: ".6rem", fontWeight: 500, color: "#fff" }}>JD</span>
+        </div>
+      </div>
+      {/* Contact Bar */}
+      <div style={{ background: "#F5F5F5", padding: "4px 0", borderBottom: "1.5px solid #C85A38", textAlign: "center", fontSize: ".32rem", color: "#2d2d2d", fontWeight: 500 }}>
+        john@edu.com  |  NY, USA  |  github.com/jd
+      </div>
+      {/* Body Grid */}
+      <div style={{ display: "flex", flex: 1, padding: "1rem 1.4rem" }}>
+        <div style={{ width: "65%", paddingRight: "10px" }}>
+          <div style={{ fontSize: ".42rem", fontWeight: 700, color: "#C85A38", textTransform: "uppercase", marginBottom: "5px" }}>Experience</div>
+          <div style={{ borderBottom: "1px solid #C85A38", width: "15px", marginBottom: "8px" }} />
+          <div style={{ fontSize: ".38rem", fontWeight: 700, color: "#2d2d2d" }}>Tech Intern</div>
+          <div style={{ fontSize: ".34rem", color: "#C85A38", fontWeight: 600 }}>StartUp Inc</div>
+          <div style={{ fontSize: ".33rem", color: "#444", marginTop: "3px" }}>• Developed modular UI components using React.</div>
+        </div>
+        <div style={{ width: "35%", paddingLeft: "10px", borderLeft: "1px solid #eee" }}>
+          <div style={{ fontSize: ".42rem", fontWeight: 700, color: "#C85A38", textTransform: "uppercase", marginBottom: "5px" }}>Skills</div>
+          <div style={{ borderBottom: "1px solid #C85A38", width: "15px", marginBottom: "8px" }} />
+          {["React", "JS", "CSS"].map(sk => <div key={sk} style={{ fontSize: ".35rem", marginBottom: "3px", color: "#2d2d2d" }}>• {sk}</div>)}
         </div>
       </div>
     </div>
@@ -314,6 +402,7 @@ const MINI_PREVIEWS = {
   tech: MiniTech,
   executive: MiniExecutive,
   etherx: MiniEtherX,
+  student: MiniStudent,
 };
 
 const TAG_COLORS = {
@@ -322,6 +411,7 @@ const TAG_COLORS = {
   "For Developers": { bg: "rgba(22,163,74,0.15)", color: "#4ade80", border: "rgba(22,163,74,0.3)" },
   "Senior Level": { bg: "rgba(30,58,95,0.3)", color: "#93c5fd", border: "rgba(30,58,95,0.5)" },
   "EtherX Edition": { bg: "rgba(201,168,76,0.15)", color: "#C9A84C", border: "rgba(201,168,76,0.4)" },
+  "For Students": { bg: "rgba(200,90,56,0.15)", color: "#C85A38", border: "rgba(200,90,56,0.4)" },
 };
 
 export default function TemplateSelector({ onSelect, onBack }) {

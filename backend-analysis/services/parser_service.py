@@ -15,25 +15,12 @@ except OSError:
     nlp = en_core_web_sm.load()
 
 SKILL_DICTIONARY = {
-    # Frontend Tech
-    "react", "javascript", "python", "node", "aws", "docker", "sql", "typescript", 
-    "java", "c++", "c#", "ruby", "go", "rust", "html", "html5", "css", "css3", "mongodb", "postgresql", 
-    "mysql", "redis", "kubernetes", "azure", "gcp", "git", "linux", "machine learning",
-    "data analysis", "agile", "scrum", "vue", "angular", "nextjs", "next.js", "django",
-    "fastapi", "flask", "express", "spring boot", "react native", "flutter",
-    "pandas", "numpy", "tableau", "power bi", "hadoop", "spark", "kafka",
-    "redux", "webpack", "bootstrap", "tailwind", "sass", "less", "graphql", 
-    "apollo", "jest", "cypress", "playwright", "vite", "babel", "npm", "yarn", 
-    "pnpm", "material ui", "mui", "chakra ui", "shadcn", "svelte", "solid",
-    
-    # Backend & Infrastructure
-    "firebase", "supabase", "strapi", "contentful", "microservices", "rest api", "api",
-    "ci/cd", "jenkins", "github actions", "terraform", "ansible", "nginx", "apache",
-    
-    # Business & Soft
-    "management", "leadership", "project management", "communication", "teamwork",
-    "problem solving", "customer service", "sales", "marketing", "seo", "ux", "ui",
-    "figma", "sketch", "adobe xd", "product design"
+    "react", "javascript", "python", "node", "aws", "docker", "sql",
+    "typescript", "java", "c++", "c#", "ruby", "go", "rust",
+    "html", "css", "mongodb", "postgresql", "mysql", "redis",
+    "kubernetes", "azure", "gcp", "git", "linux", "machine learning",
+    "data analysis", "agile", "scrum", "vue", "angular", "nextjs", "django",
+    "fastapi", "flask", "express", "spring boot", "react native"
 }
 
 class ParserService:
@@ -46,6 +33,12 @@ class ParserService:
                     extracted = page.extract_text()
                     if extracted:
                         text += extracted + "\n"
+            
+            if len(text.strip()) < 100:
+                raise ValueError("Resume appears to be image-based, please rebuild and export from EtherX")
+                
+        except ValueError as ve:
+            raise ve
         except Exception as e:
             raise Exception(f"Failed to extract text from PDF: {e}")
         return text
@@ -70,32 +63,16 @@ class ParserService:
 
     @staticmethod
     def extract_skills(text: str) -> List[str]:
-        # Normalize text and handle specialty characters like '·' (middle dot)
-        # Replace middle dots, bullets, vertical bars, and slashes with spaces to facilitate word boundaries
-        clean_search_text = re.sub(r'[·•|/]', ' ', text.lower())
-        doc = nlp(clean_search_text)
-        
+        doc = nlp(text.lower())
         skills_found = set()
-        
-        # Method 1: Token-based match
         for token in doc:
             if token.text in SKILL_DICTIONARY:
                 skills_found.add(token.text)
-        
-        # Method 2: Substring match for multi-word skills and versions
+        text_lower = text.lower()
         for skill in SKILL_DICTIONARY:
-            if len(skill) > 2: # Avoid tiny substring matches
-                # Use regex with word boundaries for precision
-                pattern = r'\b' + re.escape(skill) + r'\b'
-                if re.search(pattern, clean_search_text):
-                    skills_found.add(skill)
-        
-        # Specialty handling for HTML5/CSS3 specifically if they appear as tokens
-        # sometimes tokens are "html5" but dictionary has "html"
-        if "html5" in clean_search_text: skills_found.add("html5")
-        if "css3" in clean_search_text: skills_found.add("css3")
-        
-        return sorted([s.title() if s not in ["aws", "sql"] else s.upper() for s in skills_found])
+            if " " in skill and skill in text_lower:
+                skills_found.add(skill)
+        return sorted([s.title() if s != "aws" and s != "sql" else s.upper() for s in skills_found])
 
     @staticmethod
     def extract_experience(text: str) -> List[ExperienceItem]:
@@ -214,15 +191,16 @@ class ParserService:
         return education
 
     @classmethod
-    def parse_resume(cls, file_bytes: bytes, filename: str) -> ParsedResume:
-        if filename.lower().endswith('.pdf'): raw_text = cls.extract_text_from_pdf(file_bytes)
-        elif filename.lower().endswith('.docx'): raw_text = cls.extract_text_from_docx(file_bytes)
-        else: raise ValueError(f"Unsupported file format: {filename}")
+    def parse_text(cls, raw_text: str) -> ParsedResume:
         cleaned_text = cls.clean_text(raw_text)
+        if len(cleaned_text) < 100:
+            raise ValueError("Resume appears to be image-based, please rebuild and export from EtherX")
+            
         skills = cls.extract_skills(cleaned_text)
         experience = cls.extract_experience(cleaned_text)
         education = cls.extract_education(cleaned_text)
         projects = cls.extract_projects(cleaned_text)
+        
         if not experience or all(not e.bullets for e in experience):
             doc = nlp(cleaned_text)
             fallback_bullets = []
@@ -232,4 +210,22 @@ class ParserService:
                     fallback_bullets.append(clean_sent)
             if fallback_bullets:
                 experience.append(ExperienceItem(role="Extracted Experience", company="Resume Scan", bullets=fallback_bullets))
-        return ParsedResume(skills=skills, experience=experience, education=education, projects=projects, raw_text=cleaned_text)
+        
+        return ParsedResume(
+            skills=skills, 
+            experience=experience, 
+            education=education, 
+            projects=projects, 
+            raw_text=cleaned_text
+        )
+
+    @classmethod
+    def parse_resume(cls, file_bytes: bytes, filename: str) -> ParsedResume:
+        if filename.lower().endswith('.pdf'):
+            raw_text = cls.extract_text_from_pdf(file_bytes)
+        elif filename.lower().endswith('.docx'):
+            raw_text = cls.extract_text_from_docx(file_bytes)
+        else:
+            raise ValueError(f"Unsupported file format: {filename}")
+            
+        return cls.parse_text(raw_text)

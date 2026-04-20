@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { UploadCloud, Search, File, AlertCircle, Target, CheckCircle2, XCircle } from 'lucide-react'
+import { UploadCloud, Search, File, AlertCircle, Target, CheckCircle2, XCircle, Database, Sparkles } from 'lucide-react'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 
@@ -12,6 +12,77 @@ export default function Analyze() {
   const [showResults, setShowResults] = useState(false)
   const [error, setError] = useState('')
   const [analysisData, setAnalysisData] = useState(null)
+  const [hasStoredResume, setHasStoredResume] = useState(false)
+
+  // Check for stored resume on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('etherx_resume')
+    if (stored) {
+      try {
+        const data = JSON.parse(stored)
+        // Check if it has meaningful content
+        if (data.personal?.name || data.experience?.length > 0) {
+          setHasStoredResume(true)
+        }
+      } catch (e) {
+        console.error('Error parsing stored resume', e)
+      }
+    }
+  }, [])
+
+  const flattenResumeData = (data) => {
+    if (!data) return ''
+    
+    let text = ''
+    
+    // Personal Info
+    if (data.personal) {
+      text += `Name: ${data.personal.name || ''}\n`
+      text += `Title: ${data.personal.title || ''}\n`
+      text += `Email: ${data.personal.email || ''}\n\n`
+    }
+    
+    // Summary
+    if (data.summary?.text) {
+      text += `Professional Summary:\n${data.summary.text}\n\n`
+    }
+    
+    // Experience
+    if (data.experience && data.experience.length > 0) {
+      text += `Experience:\n`
+      data.experience.forEach(exp => {
+        text += `- ${exp.role} at ${exp.company} (${exp.start || ''} - ${exp.end || (exp.current ? 'Present' : '')})\n`
+        if (exp.bullets) text += `  ${exp.bullets}\n`
+      })
+      text += '\n'
+    }
+    
+    // Skills
+    if (data.skills && data.skills.length > 0) {
+      text += `Skills: ${data.skills.join(', ')}\n\n`
+    }
+    
+    // Projects
+    if (data.projects && data.projects.length > 0) {
+      text += `Projects:\n`
+      data.projects.forEach(proj => {
+        text += `- ${proj.name}\n`
+        if (proj.bullets) text += `  ${proj.bullets}\n`
+      })
+      text += '\n'
+    }
+    
+    // Education
+    if (data.education && data.education.length > 0) {
+      text += `Education:\n`
+      data.education.forEach(edu => {
+        text += `- ${edu.degree} from ${edu.institution} (${edu.year || ''})\n`
+      })
+      text += '\n'
+    }
+    
+    return text.trim()
+  }
 
   const handleDragOver = (e) => {
     e.preventDefault()
@@ -31,31 +102,75 @@ export default function Analyze() {
   }
 
   const handleAnalyze = async () => {
-    if (!file) { setError('Please upload a file first.'); return }
-    if (!role.trim() && !jobDescription.trim()) { setError('Please specify a target role or job description.'); return }
+    // Determine the source of the resume
+    let isStoredSource = false
+    let resumeContent = null
+    
+    if (file) {
+      resumeContent = file
+    } else if (hasStoredResume) {
+      const stored = localStorage.getItem('etherx_resume')
+      if (stored) {
+        resumeContent = JSON.parse(stored)
+        isStoredSource = true
+      }
+    }
+
+    if (!resumeContent) {
+      setError('Please upload a file or build a resume in the builder first.')
+      return
+    }
+
+    if (!role.trim() && !jobDescription.trim()) {
+      setError('Please specify a target role or job description.')
+      return
+    }
 
     setError('')
-    setLoadingStage('uploading')
+    setLoadingStage(isStoredSource ? 'preparing' : 'uploading')
 
     try {
-      setLoadingStage('analyzing')
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('role', role)
-      formData.append('job_description', jobDescription)
-
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
-      const analyzeRes = await fetch(`${API_URL}/api/analyze`, {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (!analyzeRes.ok) {
-        const errData = await analyzeRes.json().catch(() => ({}))
-        throw new Error(errData.detail || `Server error: ${analyzeRes.status}`)
+      const API_URL = import.meta.env.VITE_ANALYZE_API_URL || 'http://localhost:8000'
+      let response
+      
+      if (isStoredSource) {
+        setLoadingStage('analyzing')
+        const flattenedText = flattenResumeData(resumeContent)
+        response = await fetch(`${API_URL}/api/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            resume_text: flattenedText,
+            role: role,
+            job_description: jobDescription
+          }),
+        })
+      } else {
+        setLoadingStage('analyzing')
+        const formData = new FormData()
+        formData.append('file', resumeContent)
+        formData.append('role', role)
+        formData.append('job_description', jobDescription)
+        
+        response = await fetch(`${API_URL}/api/analyze`, {
+          method: 'POST',
+          body: formData,
+        })
       }
 
-      const payload = await analyzeRes.json()
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        const detail = errData.detail || ''
+        
+        // Specific handling for image-based PDF error
+        if (detail.includes('image-based')) {
+          throw new Error('This PDF cannot be read. Please export your resume again from the Resume Builder.')
+        }
+        
+        throw new Error(detail || `Server error: ${response.status}`)
+      }
+
+      const payload = await response.json()
       setAnalysisData(payload)
       setShowResults(true)
     } catch (err) {
@@ -68,7 +183,8 @@ export default function Analyze() {
 
   const getLoadingText = () => {
     switch (loadingStage) {
-      case 'uploading': return 'Uploading...'
+      case 'preparing': return 'Reading your saved resume...'
+      case 'uploading': return 'Uploading file...'
       case 'analyzing': return 'Generating Intelligence...'
       default: return 'Analyze Profile'
     }
@@ -109,24 +225,17 @@ export default function Analyze() {
       <style>{`
         /* ─── Mobile Layout Overrides (Max 768px) ─── */
         @media (max-width: 768px) {
-          /* 1. Hide Sidebar Completely */
           aside { display: none !important; }
-          
-          /* 2 & 3. Main Content Area 100% Width & Single Column */
           main { 
             width: 100% !important; 
             margin: 0 !important; 
             padding: 0 !important; 
             flex-direction: column !important;
           }
-          
-          /* 7. Padding and margins — 1rem on all sides instead of larger desktop */
           main > div > div, .analyze-page-container { 
             padding: 1rem !important; 
             box-sizing: border-box !important;
           }
-          
-          /* 5. Upload area 100% width, min-height 200px */
           .upload-drop-zone {
             width: 100% !important;
             min-height: 200px !important;
@@ -135,7 +244,6 @@ export default function Analyze() {
           }
         }
         
-        /* 4. Text wrapping for all textual elements */
         .analyze-page-container h1, 
         .analyze-page-container h2, 
         .analyze-page-container h3, 
@@ -146,7 +254,6 @@ export default function Analyze() {
           overflow-wrap: break-word;
         }
 
-        /* 6. Font sizes below 480px */
         @media (max-width: 480px) {
           .analyze-page-container h1, 
           .analyze-page-container h2, 
@@ -162,15 +269,18 @@ export default function Analyze() {
           .analyze-page-container .text-sm,
           .analyze-page-container .text-xs,
           .analyze-page-container .text-base {
-            font-size: 0.8rem !important; /* Min 0.8rem */
+            font-size: 0.8rem !important;
             line-height: 1.4 !important;
           }
         }
       `}</style>
       <div>
-        <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Analyze Resume</h1>
+        <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Resume Analyzer</h1>
         <p className="mt-2 text-sm md:text-base" style={{ color: 'rgba(201,168,76,0.8)' }}>
-          Upload a resume and provide job context to generate intelligence scoring.
+          {hasStoredResume && !file 
+            ? "Your saved resume is ready to analyze. You can also upload a different file."
+            : "Upload a resume or provide job context to generate intelligence scoring."
+          }
         </p>
       </div>
 
@@ -193,7 +303,11 @@ export default function Analyze() {
                   className={`upload-drop-zone border-2 border-dashed rounded-xl p-8 md:p-12 text-center transition-colors flex flex-col items-center justify-center ${
                     file ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
                   }`}
-                  style={{ borderColor: file ? 'var(--accent-gold)' : 'rgba(201,168,76,0.3)', backgroundColor: file ? 'rgba(201,168,76,0.05)' : 'transparent' }}
+                  style={{ 
+                    borderColor: file ? 'var(--accent-gold)' : 'rgba(201,168,76,0.3)', 
+                    backgroundColor: file ? 'rgba(201,168,76,0.05)' : 'transparent',
+                    opacity: (!file && hasStoredResume) ? 0.7 : 1
+                  }}
                 >
                     <motion.div
                       animate={{ y: [0, -10, 0] }}
@@ -202,19 +316,19 @@ export default function Analyze() {
                     >
                       {file
                         ? <File className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'var(--accent-gold)' }} />
-                        : <UploadCloud className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'var(--text-muted)' }} />
+                        : (hasStoredResume ? <Database className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'rgba(201,168,76,0.6)' }} /> : <UploadCloud className="h-12 w-12 md:h-16 md:w-16" style={{ color: 'var(--text-muted)' }} />)
                       }
                     </motion.div>
                     <h3 className="text-lg md:text-xl font-semibold mb-2" style={{ fontFamily: "'Cinzel', serif", color: 'var(--accent-gold)' }}>
-                      {file ? file.name : 'Drag & drop your resume'}
+                      {file ? file.name : (hasStoredResume ? 'EtherX Stored Resume Detected' : 'Drag & drop your resume')}
                     </h3>
                     <p className="text-xs md:text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>
-                    {file
-                      ? `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`
-                      : 'Supports PDF and DOCX formats up to 5MB'
-                    }
-                  </p>
-                  <div className="flex justify-center">
+                      {file
+                        ? `Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`
+                        : (hasStoredResume ? 'You can analyze your saved profile or upload a new one' : 'Supports PDF and DOCX formats up to 5MB')
+                      }
+                    </p>
+                  <div className="flex justify-center gap-4">
                     <label className="cursor-pointer">
                       <div className="px-4 py-2 border rounded-md text-sm font-medium transition-colors" style={{ borderColor: 'var(--accent-gold)', color: 'var(--accent-gold)' }} onMouseEnter={e => { e.currentTarget.style.backgroundColor = 'rgba(201,168,76,0.1)' }} onMouseLeave={e => { e.currentTarget.style.backgroundColor = 'transparent' }}>
                         Browse Files
@@ -232,6 +346,15 @@ export default function Analyze() {
                         }}
                       />
                     </label>
+                    {file && (
+                      <button 
+                        onClick={() => setFile(null)}
+                        className="px-4 py-2 border rounded-md text-sm font-medium transition-colors" 
+                        style={{ borderColor: 'rgba(239,68,68,0.5)', color: '#ef4444' }}
+                      >
+                        Use Saved Instead
+                      </button>
+                    )}
                   </div>
                   {error && (
                     <motion.div
@@ -287,7 +410,7 @@ export default function Analyze() {
                   <button
                     onClick={handleAnalyze}
                     disabled={loadingStage !== 'idle'}
-                    className="w-full md:w-auto"
+                    className="w-full md:w-auto overflow-hidden relative group"
                     style={{
                       padding: '10px 24px',
                       background: 'linear-gradient(135deg, #A07830, #C9A84C, #F0C040)',
@@ -305,16 +428,23 @@ export default function Analyze() {
                     onMouseEnter={e => { if (loadingStage === 'idle') { e.currentTarget.style.transform = 'translateY(-2px)' } }}
                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)' }}
                   >
-                    {loadingStage !== 'idle' ? (
-                      <div className="flex items-center justify-center">
-                        <motion.div
-                          animate={{ rotate: 360 }}
-                          transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                          className="mr-2 border-2 border-t-transparent border-primary-foreground rounded-full w-4 h-4"
-                        />
-                        {getLoadingText()}
-                      </div>
-                    ) : 'Analyze Match'}
+                    <div className="flex items-center justify-center">
+                      {loadingStage !== 'idle' ? (
+                        <>
+                          <motion.div
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                            className="mr-2 border-2 border-t-transparent border-black rounded-full w-4 h-4"
+                          />
+                          {getLoadingText()}
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          {hasStoredResume && !file ? 'Analyze Saved Resume' : 'Analyze Match'}
+                        </>
+                      )}
+                    </div>
                   </button>
                 </div>
               </CardContent>
@@ -330,8 +460,10 @@ export default function Analyze() {
           >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h2 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--accent-gold)' }}>Analysis Results</h2>
-                <p className="text-sm" style={{ color: 'rgba(201,168,76,0.8)' }}>Direct compatibility check</p>
+                <h2 className="text-xl md:text-2xl font-bold" style={{ color: 'var(--accent-gold)' }}>Intelligence Report</h2>
+                <p className="text-sm" style={{ color: 'rgba(201,168,76,0.8)' }}>
+                  {analysisData?.ats_verdict || "Resume analysis complete"}
+                </p>
               </div>
               <button
                 className="px-4 py-2 rounded-md text-sm font-medium transition-colors w-full sm:w-auto"
@@ -343,8 +475,6 @@ export default function Analyze() {
                 onClick={() => {
                   setShowResults(false)
                   setFile(null)
-                  setRole('')
-                  setJobDescription('')
                   setAnalysisData(null)
                 }}
               >
@@ -355,93 +485,83 @@ export default function Analyze() {
             <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
               <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
                 <CardContent className="pt-6 flex justify-center">
-                  {renderScoreCircle("Overall Match\nScore", analysisData?.overall_score)}
+                  {renderScoreCircle("Overall Match\nProbability", analysisData?.shortlisting_probability * 100)}
                 </CardContent>
               </Card>
               <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
                 <CardContent className="pt-6 flex justify-center">
-                  {renderScoreCircle("Keyword\nMatch", analysisData?.keyword_match_score)}
+                  {renderScoreCircle("Semantic\nFit", analysisData?.semantic_fit_score * 100)}
                 </CardContent>
               </Card>
               <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
                 <CardContent className="pt-6 flex justify-center">
-                  {renderScoreCircle("Experience\nRelevance", analysisData?.experience_relevance_score)}
+                  {renderScoreCircle("Skill\nCoverage", (() => {
+                    const required = analysisData?.required_skills || []
+                    const resumeSkills = (analysisData?.skills || []).map(s => s.toLowerCase())
+                    if (!required.length) return 0
+                    const matched = required.filter(r =>
+                      resumeSkills.some(s => s.includes(r.toLowerCase()) || r.toLowerCase().includes(s))
+                    ).length
+                    return Math.min(100, Math.round((matched / required.length) * 100))
+                  })())}
                 </CardContent>
               </Card>
               <Card className="col-span-1 border" style={{ borderColor: 'rgba(201,168,76,0.2)' }}>
                 <CardContent className="pt-6 flex justify-center">
-                  {renderScoreCircle("ATS\nCompliance", analysisData?.ats_compliance_score)}
+                  {renderScoreCircle("ATS\nScore", Math.round((analysisData?.ats_score ?? 0) * 100))}
                 </CardContent>
               </Card>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Matched Keywords */}
               <Card className="border" style={{ borderColor: 'rgba(34,197,94,0.3)' }}>
                 <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(34,197,94,0.1)', background: 'rgba(34,197,94,0.05)' }}>
                   <CardTitle className="text-base flex items-center text-green-500">
-                    <CheckCircle2 className="w-4 h-4 mr-2" /> Matched Keywords
+                    <CheckCircle2 className="w-4 h-4 mr-2" /> Strengths
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {(!analysisData?.matched_keywords || analysisData.matched_keywords.length === 0) ? (
-                      <span className="text-sm text-green-600/60 italic">No exact matches found.</span>
-                    ) : (
-                      analysisData.matched_keywords.map((kw, i) => (
-                        <span key={i} className="px-2.5 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400 border border-green-500/20 shadow-sm">
-                          {kw}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Missing Keywords */}
-              <Card className="border" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
-                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(239,68,68,0.1)', background: 'rgba(239,68,68,0.05)' }}>
-                  <CardTitle className="text-base flex items-center text-red-500">
-                    <XCircle className="w-4 h-4 mr-2" /> Missing Keywords
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {(!analysisData?.missing_keywords || analysisData.missing_keywords.length === 0) ? (
-                      <span className="text-sm text-red-600/60 italic">No missing keywords!</span>
-                    ) : (
-                      analysisData.missing_keywords.map((kw, i) => (
-                        <span key={i} className="px-2.5 py-1 text-xs font-medium rounded-full bg-red-500/10 text-red-400 border border-red-500/20 shadow-sm">
-                          {kw}
-                        </span>
-                      ))
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Improvement Suggestions */}
-            {analysisData?.improvement_suggestions && analysisData.improvement_suggestions.length > 0 && (
-              <Card className="border" style={{ borderColor: 'rgba(201,168,76,0.3)' }}>
-                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.05)' }}>
-                  <CardTitle className="text-base flex items-center" style={{ color: 'var(--accent-gold)' }}>
-                    <Target className="w-4 h-4 mr-2" /> Resume Target Feedback
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-4">
-                  <ul className="space-y-3">
-                    {analysisData.improvement_suggestions.map((s, i) => (
-                      <li key={i} className="flex items-start text-sm" style={{ color: 'rgba(201,168,76,0.9)' }}>
-                        <span className="mr-2 mt-0.5" style={{ color: 'var(--accent-gold)' }}>•</span>
-                        {s}
-                      </li>
+                  <ul className="space-y-2">
+                    {analysisData?.strengths?.map((s, i) => (
+                      <li key={i} className="text-sm text-green-400/90 leading-relaxed">• {s}</li>
                     ))}
                   </ul>
                 </CardContent>
               </Card>
-            )}
 
+              <Card className="border" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+                <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(239,68,68,0.1)', background: 'rgba(239,68,68,0.05)' }}>
+                  <CardTitle className="text-base flex items-center text-red-500">
+                    <XCircle className="w-4 h-4 mr-2" /> Areas for Improvement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-4">
+                  <ul className="space-y-2">
+                    {analysisData?.weaknesses?.map((w, i) => (
+                      <li key={i} className="text-sm text-red-400/90 leading-relaxed">• {w}</li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border" style={{ borderColor: 'rgba(201,168,76,0.3)' }}>
+              <CardHeader className="pb-3 border-b" style={{ borderColor: 'rgba(201,168,76,0.1)', background: 'rgba(201,168,76,0.05)' }}>
+                <CardTitle className="text-base flex items-center" style={{ color: 'var(--accent-gold)' }}>
+                  <Target className="w-4 h-4 mr-2" /> Strategic Suggestions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-4">
+                <ul className="space-y-3">
+                  {analysisData?.suggestions?.map((s, i) => (
+                    <li key={i} className="flex items-start text-sm" style={{ color: 'rgba(201,168,76,0.9)' }}>
+                      <span className="mr-2 mt-0.5 text-gold">•</span>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>

@@ -3,7 +3,6 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from config.settings import settings
-from services.groq_health import check_groq_running
 from routers import (
     system,
     analysis,
@@ -13,8 +12,8 @@ from routers import (
     prediction_router,
     explainability_router,
     optimization_router,
-    llm_router,
 )
+from routers import llm_enhance
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,17 +47,33 @@ async def startup_event():
     logger.info(f"Starting {settings.PROJECT_NAME} v{settings.VERSION}")
     logger.info(f"LLM config: provider={settings.LLM_PROVIDER}, model={settings.LLM_MODEL}, use_llm={settings.USE_LLM}")
 
-    # Startup health check removed to prevent Render deployment timeouts.
-    # Health status is now reported dynamically via the /health endpoint.
-
-
-@app.get("/")
-async def root():
-    return {
-        "message": "Resume Intelligence API is running",
-        "docs": "/docs",
-        "health": "/health"
-    }
+    if settings.USE_LLM and settings.LLM_PROVIDER == "groq":
+        # Only check Groq health if a real key is configured
+        if not settings.GROQ_API_KEY or settings.GROQ_API_KEY.startswith("paste-"):
+            logger.warning(
+                "⚠ GROQ_API_KEY not set — app will run in heuristic-only fallback mode. "
+                "Set GROQ_API_KEY in .env with your real key to enable LLM features."
+            )
+        else:
+            try:
+                from services.groq_health import check_groq_running
+                reachable = check_groq_running()
+                if reachable:
+                    logger.info("✓ Groq API reachable — LLM suggestions enabled.")
+                else:
+                    logger.warning(
+                        "⚠ Groq API unreachable — app will run in heuristic-only fallback mode. "
+                        "Check your GROQ_API_KEY in .env."
+                    )
+            except Exception as exc:
+                logger.warning(
+                    f"⚠ Groq health check failed ({exc}) — app will still start "
+                    "in heuristic-only fallback mode."
+                )
+    elif settings.USE_LLM and settings.LLM_PROVIDER != "groq":
+        logger.info(f"LLM provider '{settings.LLM_PROVIDER}' configured (not Groq — skipping health check).")
+    else:
+        logger.info("USE_LLM=false — running in full heuristic mode.")
 
 
 # ── Register all routers ──────────────────────────────────────────────────────
@@ -70,10 +85,9 @@ app.include_router(semantic_matching.router,    prefix="/api", tags=["Semantic M
 app.include_router(prediction_router.router,    prefix="/api", tags=["Prediction"])
 app.include_router(explainability_router.router, prefix="/api", tags=["Explainability"])
 app.include_router(optimization_router.router,  prefix="/api", tags=["Optimization"])
-app.include_router(llm_router.router,           prefix="/api", tags=["LLM"])
+app.include_router(llm_enhance.router,          prefix="/api", tags=["LLM Enhance"])
+
 
 if __name__ == "__main__":
-    import os
     import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

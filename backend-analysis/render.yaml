@@ -4,7 +4,7 @@
 
 services:
   - type: web
-    name: resume-analysis-service
+    name: resume-intelligence-api
     runtime: python
     plan: free
     region: oregon
@@ -13,7 +13,7 @@ services:
       pip install -r requirements.txt
       python -m spacy download en_core_web_sm
 
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn main:app --host 0.0.0.0 --port 10000
 
     healthCheckPath: /health
 

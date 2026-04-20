@@ -18,9 +18,10 @@ This service handles AI-powered resume intelligence and requires your Groq API k
     *   **Build Command**: `pip install -r requirements.txt && python -m spacy download en_core_web_sm`
     *   **Start Command**: `uvicorn main:app --host 0.0.0.0 --port 10000`
 5.  **Environment Variables**: Add the following:
-    *   `GROQ_API_KEY`: *(Your real Groq API key)*
+    *   `GROQ_API_KEY`: *(Your real Groq API key — the one from GROQ_API_KEY_ANALYZER in your .env)*
     *   `USE_LLM`: `true`
     *   `LLM_PROVIDER`: `groq`
+    *   `LLM_MODEL`: `llama-3.3-70b-versatile`
 
 ### B. Export Service (`backend`)
 This service handles PDF and DOCX generation.

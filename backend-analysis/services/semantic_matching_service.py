@@ -1,53 +1,61 @@
 # services/semantic_matching_service.py
 """
-Layer 1 — Semantic Matching (LIGHTWEIGHT - TF-IDF)
-Uses scikit-learn TfidfVectorizer to compute cosine similarity.
-Optimized for Render's 512MB RAM limit.
-No heavy sentence-transformers or PyTorch involved.
+Layer 1 — Semantic Matching (PURE LOCAL, no LLM calls)
+Uses sentence-transformers MiniLM (all-MiniLM-L6-v2) loaded locally
+to compute cosine similarity between resume sentences and job responsibilities.
+Model loads once on first use and is reused across requests.
 """
 import logging
 import numpy as np
-import re
 from typing import Dict, Any, List
 
 logger = logging.getLogger(__name__)
 
 try:
-    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sentence_transformers import SentenceTransformer
     from sklearn.metrics.pairwise import cosine_similarity
-    _ML_AVAILABLE = True
+    _TRANSFORMERS_AVAILABLE = True
 except ImportError:
-    TfidfVectorizer = None
+    SentenceTransformer = None
     cosine_similarity = None
-    _ML_AVAILABLE = False
-    logger.warning("scikit-learn not installed. Semantic matching will return 0.0")
+    _TRANSFORMERS_AVAILABLE = False
+    logger.warning("sentence-transformers or scikit-learn not installed. Semantic matching will return 0.0")
 
 
 class SemanticMatchingService:
     """
-    Local TF-IDF based semantic matcher.
-    Extremely memory efficient compared to transformer models.
+    Local MiniLM-based semantic matcher.
+    No LLM calls — all inference is on-device using sentence-transformers.
     """
 
     def __init__(self):
-        self._vectorizer = TfidfVectorizer(stop_words='english')
+        self._model = None
+
+    def _load_model(self):
+        if self._model is None and _TRANSFORMERS_AVAILABLE:
+            logger.info("Loading MiniLM model (all-MiniLM-L6-v2)…")
+            self._model = SentenceTransformer("all-MiniLM-L6-v2")
+            logger.info("MiniLM model loaded.")
 
     @staticmethod
     def _split_sentences(text: str, max_sentences: int = 30) -> List[str]:
         """Split text into meaningful sentences, skip very short ones."""
+        import re
         raw = re.split(r"(?<=[.!?])\s+|\n", text)
-        sentences = [s.strip() for s in raw if len(s.strip().split()) >= 3]
+        sentences = [s.strip() for s in raw if len(s.strip().split()) >= 4]
         return sentences[:max_sentences]
 
     def compute_semantic_fit(
         self, resume_json: Dict[str, Any], role_json: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
-        Compute similarity using TF-IDF and Cosine Similarity.
-        Return overall semantic_fit_score + top 5 matches.
+        Encode resume sentences and job responsibilities with MiniLM.
+        Return overall semantic_fit_score + top 5 matches by cosine similarity.
         """
-        if not _ML_AVAILABLE:
-            logger.warning("ML libraries unavailable — returning zero semantic score.")
+        self._load_model()
+
+        if not self._model:
+            logger.warning("MiniLM unavailable — returning zero semantic score.")
             return {"semantic_fit_score": 0.0, "matches": []}
 
         raw_text: str = resume_json.get("raw_text", "")
@@ -69,59 +77,51 @@ class SemanticMatchingService:
                 "General software engineering skills"
             ]
 
-        try:
-            # Combine all text to fit the vectorizer
-            all_corpus = resume_sentences + responsibilities
-            tfidf_matrix = self._vectorizer.fit_transform(all_corpus)
-            
-            # Split matrix back into resume and role parts
-            resume_tfidf = tfidf_matrix[:len(resume_sentences)]
-            role_tfidf = tfidf_matrix[len(resume_sentences):]
+        # Encode both sides
+        resume_embeddings = self._model.encode(resume_sentences, show_progress_bar=False)
+        role_embeddings = self._model.encode(responsibilities, show_progress_bar=False)
 
-            # Compute similarity matrix [n_resume_sents × n_responsibilities]
-            sim_matrix = cosine_similarity(resume_tfidf, role_tfidf)
+        # Compute full similarity matrix  [n_resume_sents × n_responsibilities]
+        sim_matrix = cosine_similarity(resume_embeddings, role_embeddings)
 
-            # Overall fit = mean of best match for each responsibility
-            per_resp_max = np.max(sim_matrix, axis=0)
-            overall_fit = float(np.mean(per_resp_max))
+        # Overall fit = mean of top-k maximum similarities per responsibility
+        per_resp_max = np.max(sim_matrix, axis=0)             # best resume match for each responsibility
+        overall_fit = float(np.mean(per_resp_max))
 
-            # Build top-5 individual match pairs
-            pairs = []
-            for r_idx, r_sent in enumerate(resume_sentences):
-                for j_idx, j_req in enumerate(responsibilities):
-                    pairs.append((
-                        float(sim_matrix[r_idx, j_idx]),
-                        r_sent,
-                        j_req,
-                    ))
-            pairs.sort(key=lambda x: x[0], reverse=True)
+        # Build top-5 individual match pairs
+        pairs = []
+        for r_idx, r_sent in enumerate(resume_sentences):
+            for j_idx, j_req in enumerate(responsibilities):
+                pairs.append((
+                    float(sim_matrix[r_idx, j_idx]),
+                    r_sent,
+                    j_req,
+                ))
+        pairs.sort(key=lambda x: x[0], reverse=True)
 
-            # Deduplicate — each resume sentence and each requirement appears at most once
-            seen_resume, seen_role = set(), set()
-            top_matches = []
-            for score, r_sent, j_req in pairs:
-                if score < 0.10: # Lower threshold for TF-IDF since it's more sparse
-                    break
-                if r_sent in seen_resume or j_req in seen_role:
-                    continue
-                seen_resume.add(r_sent)
-                seen_role.add(j_req)
-                top_matches.append({
-                    "resume_sentence": r_sent,
-                    "job_requirement": j_req,
-                    "similarity": round(score, 4),
-                })
-                if len(top_matches) == 5:
-                    break
+        # Deduplicate — each resume sentence and each requirement appears at most once
+        seen_resume, seen_role = set(), set()
+        top_matches = []
+        for score, r_sent, j_req in pairs:
+            if score < 0.20:
+                break
+            if r_sent in seen_resume or j_req in seen_role:
+                continue
+            seen_resume.add(r_sent)
+            seen_role.add(j_req)
+            top_matches.append({
+                "resume_sentence": r_sent,
+                "job_requirement": j_req,
+                "similarity": round(score, 4),
+            })
+            if len(top_matches) == 5:
+                break
 
-            return {
-                "semantic_fit_score": round(min(1.0, max(0.0, overall_fit * 1.5)), 4), # Boost TF-IDF scores slightly for UX
-                "matches": top_matches,
-            }
-        except Exception as e:
-            logger.error(f"Semantic matching failed: {e}")
-            return {"semantic_fit_score": 0.0, "matches": []}
+        return {
+            "semantic_fit_score": round(min(1.0, max(0.0, overall_fit)), 4),
+            "matches": top_matches,
+        }
 
 
-# Module-level singleton
+# Module-level singleton — model loaded once at first request
 semantic_matcher = SemanticMatchingService()

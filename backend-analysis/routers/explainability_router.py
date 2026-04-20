@@ -11,19 +11,18 @@ router = APIRouter()
 @router.post("/explain-analysis", response_model=ExplainabilityResponse)
 async def explain_analysis(request: ExplainabilityRequest):
     try:
-        result = explainability_service.generate_suggestions(
+        result = explainability_service.generate_analysis_explanation(
             resume_json=request.resume_json,
             role_json=request.role_json,
+            semantic_result=request.semantic_result,
             prediction_result=request.prediction_result,
         )
         return ExplainabilityResponse(
-            strengths=[],
-            weaknesses=[],
+            strengths=result.get("strengths", []),
+            weaknesses=result.get("weaknesses", []),
             suggestions=result.get("suggestions", []),
-            study_roadmap=result.get("study_roadmap"),
-            skill_gap_explanation=result.get("skill_gap_explanation"),
-            ats_verdict=None,
-            one_line_summary=None,
+            ats_verdict=result.get("ats_verdict"),
+            one_line_summary=result.get("one_line_summary"),
         )
     except Exception as exc:
         logger.error(f"Explainability endpoint error: {exc}")

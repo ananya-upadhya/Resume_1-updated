@@ -1,267 +1,621 @@
 /* ─────────────────────────────────────────────────────────
-   TECH TEMPLATE  —  ATS-Optimized
-   Developer-focused · Compact · Green accent · Code style
-   ATS Score: 96/100
-   
-   Fixes:
-   - Removed emoji from contact prefixes (used text labels)
-   - Skills rendered as readable plain list (not just chips)
-   - Section names match ATS keywords (Summary, Work Experience,
-     Skills, Education, Certifications)
-   - page-break-inside: avoid on every entry
-   - Contact block uses standard readable text
+   TECH TEMPLATE  —  Modern IT Professional
+   Two-Column · Dark Navy & Gold · ATS Optimized
+   Layout: Left (35%) #1A2B3C | Right (65%) #FFFFFF
 ───────────────────────────────────────────────────────── */
 
+import React from 'react';
+
+/* ── Helpers ───────────────────────────────────────────── */
 const parseBullets = t =>
-  (t || '').split('\n').map(l => l.trim().replace(/^[-•▸◆*]\s*/, '')).filter(Boolean)
+  (t || '').split('\n').map(l => l.trim().replace(/^[-•▸◆*]\s*/, '')).filter(Boolean);
 
-const fmtM = m => {
-  if (!m) return ''
-  const [dd, mo, yyyy] = m.split('-')
-  const mon = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+mo - 1]
-  return mon ? `${mon} ${yyyy}` : m
-}
+const fmtDate = m => {
+  if (!m) return '';
+  const parts = m.split('-');
+  if (parts.length === 3) {
+    const mon = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+parts[1] - 1];
+    return mon ? `${mon} ${parts[0]}` : m;
+  }
+  return m;
+};
 
-const GREEN  = '#16a34a'
-const GREEN2 = '#dcfce7'
-const MONO   = "'Courier New', Courier, monospace"
-const SANS   = "'DM Sans', sans-serif"
+const GOLD = '#C9A84C';
+const DARK_NAVY = '#1A2B3C';
+const DEEP_NAVY = '#0D2137';
+const WHITE = '#FFFFFF';
+const TEXT_RIGHT = '#222222';
+const SANS = "'Inter', 'DM Sans', sans-serif";
+const SERIF = "'Cinzel', serif";
 
 export default function TechTemplate({ data }) {
   const {
     personal: p = {},
-    summary:  s = { text: '' },
-    experience    = [],
-    education     = [],
-    skills        = [],
-    projects      = [],
+    summary: s = { text: '' },
+    experience = [],
+    education = [],
+    skills = [],
+    projects = [],
     certifications = [],
-  } = data || {}
+    awards = [],
+    languages = [],
+  } = data || {};
 
-  const hasContent = p.name || s?.text || experience.length || education.length || skills.length
+  const hasContent = p.name || s?.text || experience.length || education.length || skills.length;
 
   if (!hasContent) return (
-    <div style={{ width:'100%', maxWidth:'680px', background:'#fff', minHeight:'792px',
-      alignSelf:'flex-start', display:'flex', alignItems:'center', justifyContent:'center',
-      boxShadow:'0 4px 6px rgba(0,0,0,0.04),0 16px 48px rgba(0,0,0,0.10)' }}>
-      <div style={{ textAlign:'center', color:'#999', fontFamily: SANS }}>
-        <div style={{ fontSize:'2.5rem', marginBottom:'.5rem' }}>💻</div>
-        <div style={{ fontSize:'.85rem' }}>Your Resume Appears Here</div>
+    <div style={{
+      width: '100%', maxWidth: '720px', background: '#fff', minHeight: '800px',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.1)', borderRadius: '8px'
+    }}>
+      <div style={{ textAlign: 'center', color: '#ccc', fontFamily: SANS }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💻</div>
+        <p>Tech Resume Preview</p>
       </div>
     </div>
-  )
+  );
 
-  /* ATS-safe: text labels, no emoji */
-  const contacts = [
-    p.email    && { label: 'email',    val: p.email },
-    p.phone    && { label: 'phone',    val: p.phone },
-    p.location && { label: 'location', val: p.location },
-    p.linkedin && { label: 'linkedin', val: p.linkedin },
-    p.github   && { label: 'github',   val: p.github },
-    p.website  && { label: 'website',  val: p.website },
-  ].filter(Boolean)
+  const initials = (p.name || '')
+    .split(' ')
+    .filter(Boolean)
+    .map(n => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
-  const SH = ({ children }) => (
+  /* Section Header - Left Column (Muted) */
+  const LSH = ({ children }) => (
     <div style={{
-      display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.55rem',
-      pageBreakAfter:'avoid', breakAfter:'avoid',
+      fontFamily: SANS, fontSize: '0.7rem', fontWeight: 700,
+      textTransform: 'uppercase', letterSpacing: '0.15em',
+      color: GOLD, marginBottom: '0.8rem', marginTop: '1.5rem',
+      borderBottom: `1px solid rgba(201, 168, 76, 0.3)`,
+      paddingBottom: '0.3rem'
     }}>
-      <span style={{ fontFamily: MONO, fontSize:'.65rem', color: GREEN, fontWeight:700 }}>//</span>
-      <span style={{ fontFamily: SANS, fontSize:'.65rem', fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#0f172a' }}>{children}</span>
-      <div style={{ flex:1, height:'1px', background:'#e2e8f0' }} />
+      {children}
     </div>
-  )
+  );
+
+  /* Section Header - Right Column (Bold) */
+  const RSH = ({ title }) => (
+    <div style={{ marginBottom: '1.2rem', marginTop: '1.5rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+        <span style={{
+          fontFamily: SANS, fontSize: '0.95rem', fontWeight: 800,
+          color: GOLD, textTransform: 'uppercase', letterSpacing: '0.05em'
+        }}>{title}</span>
+      </div>
+      <div style={{ height: '2px', background: `linear-gradient(to right, ${GOLD}, #14b8a6)`, width: '100%' }} />
+    </div>
+  );
 
   return (
     <div id="resume-output" style={{
-      width:'100%', maxWidth:'680px', background:'#fff', color:'#1a1a1a',
-      padding:'2rem 2.2rem', minHeight:'792px', alignSelf:'flex-start',
-      fontFamily: SANS, fontSize:'.85rem', lineHeight:1.6,
-      boxShadow:'0 4px 6px rgba(0,0,0,0.04),0 16px 48px rgba(0,0,0,0.10)',
+      width: '100%', maxWidth: '800px', background: WHITE,
+      minHeight: '1050px', display: 'flex', boxShadow: '0 20px 50px rgba(0,0,0,0.15)',
+      overflow: 'hidden', alignSelf: 'flex-start'
     }}>
+      {/* Load Fonts */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600;800&display=swap');
+      `}} />
 
-      {/* HEADER */}
-      <div style={{ borderLeft:`4px solid ${GREEN}`, paddingLeft:'1rem', marginBottom:'1.2rem' }}>
-        <div style={{ fontFamily: MONO, fontSize:'1.6rem', fontWeight:700, color:'#0f172a', lineHeight:1.2 }}>
-          {p.name || 'Your Name'}
+      {/* LEFT COLUMN (35%) */}
+      <div style={{
+        width: '35%', background: DARK_NAVY, color: WHITE,
+        padding: '2.5rem 1.5rem', display: 'flex', flexDirection: 'column'
+      }}>
+        {/* AVATAR */}
+        <div style={{
+          width: '70px', height: '70px', background: GOLD, borderRadius: '50%',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          alignSelf: 'center', marginBottom: '1.2rem',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)', border: `3px solid rgba(255,255,255,0.1)`
+        }}>
+          <span style={{ fontFamily: SERIF, fontSize: '1.5rem', fontWeight: 700, color: DARK_NAVY }}>
+            {initials || '?'}
+          </span>
         </div>
-        {p.title && (
-          <div style={{ fontFamily: MONO, fontSize:'.75rem', color: GREEN, marginTop:'.2rem' }}>
-            {'>'} {p.title}
+
+        {/* NAME & TITLE */}
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+          <h1 style={{
+            fontFamily: SERIF, fontSize: '18pt', fontWeight: 700,
+            margin: 0, lineHeight: 1.2, color: WHITE
+          }}>
+            {p.name || 'Your Name'}
+          </h1>
+          {p.title && (
+            <p style={{
+              fontFamily: SANS, fontSize: '10pt', fontStyle: 'italic',
+              margin: '0.4rem 0 0', color: GOLD, fontWeight: 500
+            }}>
+              {p.title}
+            </p>
+          )}
+        </div>
+
+        {/* CONTACT INFO */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginBottom: '1.5rem' }}>
+          {[
+            { label: 'EMAIL', val: p.email },
+            { label: 'PHONE', val: p.phone },
+            { label: 'ADDR', val: p.location },
+            { label: 'GIT', val: p.github },
+          ].filter(item => item.val).map((c, i) => (
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.75rem' }}>
+              <span style={{ color: GOLD, fontWeight: 700, minWidth: '40px' }}>{c.label}</span>
+              <span style={{ opacity: 0.9, wordBreak: 'break-all' }}>{c.val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* SUMMARY / TAGLINE */}
+        {s?.text && (
+          <div style={{ marginBottom: '1rem' }}>
+            <LSH>About Me</LSH>
+            <p style={{ fontSize: '0.78rem', lineHeight: 1.6, margin: 0, opacity: 0.85 }}>
+              {s.text}
+            </p>
+          </div>
+        )}
+
+        {/* SKILLS / EXPERTISE */}
+        {skills.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            <LSH>Areas of Expertise</LSH>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+              {skills.map((sk, i) => (
+                <span key={i} style={{
+                  fontSize: '0.65rem', background: DEEP_NAVY, color: WHITE,
+                  border: `1px solid ${GOLD}`, borderRadius: '4px',
+                  padding: '0.2rem 0.5rem', fontWeight: 600
+                }}>
+                  {sk}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CERTIFICATES */}
+        {certifications.length > 0 && (
+          <div style={{ marginBottom: '1rem' }}>
+            <LSH>Certificates</LSH>
+            {certifications.map((c, i) => (
+              <div key={i} style={{ marginBottom: '0.6rem' }}>
+                <div style={{ fontSize: '0.75rem', fontWeight: 600, color: GOLD }}>{c.name}</div>
+                <div style={{ fontSize: '0.65rem', opacity: 0.7 }}>{c.issuer}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* LANGUAGES */}
+        {(languages && languages.length > 0) && (
+          <div>
+            <LSH>Languages</LSH>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              {languages.map((l, i) => (
+                <div key={i} style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between' }}>
+                  <span>{l.name || l}</span>
+                  <span style={{ color: GOLD, fontSize: '0.65rem' }}>{l.level}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      {/* CONTACT — ATS-safe: label: value format, plain text */}
-      {contacts.length > 0 && (
-        <div style={{
-          background:'#f8fafc', border:'1px solid #e2e8f0', borderRadius:'6px',
-          padding:'.55rem .75rem', marginBottom:'1.2rem',
-          display:'flex', flexWrap:'wrap', gap:'.25rem .9rem',
-        }}>
-          {contacts.map((c, i) => (
-            <span key={i} style={{ fontFamily: MONO, fontSize:'.63rem', color:'#334155' }}>
-              <span style={{ color: GREEN, fontWeight:700 }}>{c.label}:</span>{c.val}
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* SUMMARY */}
-      {s?.text && (
-        <div style={{ marginBottom:'1.1rem', pageBreakInside:'avoid', breakInside:'avoid' }}>
-          <SH>Summary</SH>
-          <p style={{ fontSize:'.82rem', color:'#334155', lineHeight:1.75, margin:0, borderLeft:`2px solid ${GREEN2}`, paddingLeft:'.65rem' }}>
-            {s.text}
-          </p>
-        </div>
-      )}
-
-      {/* WORK EXPERIENCE */}
-      {experience.length > 0 && (
-        <div style={{ marginBottom:'1.1rem' }}>
-          <SH>Work Experience</SH>
-          {experience.map((e, i) => (
-            <div key={i} style={{ marginBottom:'.85rem', pageBreakInside:'avoid', breakInside:'avoid' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.5rem' }}>
-                <div>
-                  <span style={{ fontWeight:700, color:'#0f172a', fontSize:'.82rem' }}>{e.role || 'Role'}</span>
-                  <span style={{ color:'#64748b', fontSize:'.78rem' }}> @ {e.company}</span>
+      {/* RIGHT COLUMN (65%) */}
+      <div style={{ width: '65%', background: WHITE, padding: '2.5rem 2rem' }}>
+        {/* WORK EXPERIENCE */}
+        {experience.length > 0 && (
+          <section style={{ marginBottom: '2rem' }}>
+            <RSH title="Work Experience" />
+            {experience.map((e, i) => (
+              <div key={i} style={{ marginBottom: '1.5rem', position: 'relative' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 700, color: DARK_NAVY }}>
+                      {e.role}
+                    </h3>
+                    <div style={{ color: GOLD, fontWeight: 600, fontSize: '0.9rem', marginTop: '0.1rem' }}>
+                      {e.company}
+                    </div>
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem', color: '#666', background: '#f8fafc',
+                    padding: '0.15rem 0.6rem', borderRadius: '12px', border: '1px solid #e2e8f0'
+                  }}>
+                    {fmtDate(e.start)} — {e.current ? 'Present' : fmtDate(e.end)}
+                  </div>
                 </div>
-                <div style={{
-                  fontFamily: MONO, fontSize:'.62rem', color:'#94a3b8', whiteSpace:'nowrap',
-                  flexShrink:0, background:'#f1f5f9', padding:'.1rem .4rem', borderRadius:'4px',
-                }}>
-                  {fmtM(e.start)}{e.start ? ' – ' : ''}{e.current ? 'Present' : fmtM(e.end)}
-                </div>
-              </div>
-              {e.bullets && (
-                <ul style={{ listStyle:'none', padding:0, margin:'.2rem 0 0' }}>
+                <ul style={{ paddingLeft: '1.1rem', margin: '0.6rem 0 0', listStyle: 'none' }}>
                   {parseBullets(e.bullets).map((b, j) => (
                     <li key={j} style={{
-                      display:'flex', gap:'.45rem', fontSize:'.79rem', color:'#334155',
-                      lineHeight:1.6, marginBottom:'.05rem',
-                      pageBreakInside:'avoid', breakInside:'avoid',
+                      fontSize: '0.85rem', color: TEXT_RIGHT, lineHeight: 1.5,
+                      marginBottom: '0.3rem', position: 'relative'
                     }}>
-                      <span style={{ color: GREEN, fontFamily: MONO, flexShrink:0, fontSize:'.7rem', marginTop:'.06rem' }}>→</span>
+                      <span style={{ position: 'absolute', left: '-1rem', color: GOLD }}>•</span>
                       {b}
                     </li>
                   ))}
                 </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* PROJECTS */}
-      {projects.length > 0 && (
-        <div style={{ marginBottom:'1.1rem' }}>
-          <SH>Projects</SH>
-          {projects.map((pr, i) => (
-            <div key={i} style={{
-              marginBottom:'.85rem', background:'#f8fafc',
-              border:'1px solid #e2e8f0', borderRadius:'6px', padding:'.6rem .8rem',
-              pageBreakInside:'avoid', breakInside:'avoid',
-            }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:'.5rem', marginBottom:'.2rem' }}>
-                <div>
-                  <span style={{ fontWeight:700, color:'#0f172a', fontSize:'.82rem' }}>{pr.name || 'Project'}</span>
-                  {pr.tech && (
-                    <span style={{
-                      fontFamily: MONO, fontSize:'.62rem', color: GREEN,
-                      background: GREEN2, padding:'.08rem .4rem', borderRadius:'4px', marginLeft:'.5rem',
-                    }}>{pr.tech}</span>
-                  )}
-                </div>
-                {pr.url && (
-                  <a style={{ fontFamily: MONO, fontSize:'.62rem', color: GREEN, textDecoration:'none' }}
-                    href={`https://${pr.url}`} target="_blank" rel="noreferrer">{pr.url}</a>
-                )}
               </div>
-              {pr.bullets && (
-                <ul style={{ listStyle:'none', padding:0, margin:'.15rem 0 0' }}>
+            ))}
+          </section>
+        )}
+
+        {/* PROJECTS */}
+        {projects.length > 0 && (
+          <section style={{ marginBottom: '2rem' }}>
+            <RSH title="Key Projects" />
+            {projects.map((pr, i) => (
+              <div key={i} style={{ marginBottom: '1.2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 700, color: DARK_NAVY }}>{pr.name}</h4>
+                  {pr.url && <a href={pr.url} style={{ fontSize: '0.75rem', color: GOLD, textDecoration: 'none' }}>Link</a>}
+                </div>
+                {pr.tech && <div style={{ fontSize: '0.75rem', color: '#666', fontStyle: 'italic' }}>{pr.tech}</div>}
+                <ul style={{ paddingLeft: '1.1rem', margin: '0.4rem 0 0', listStyle: 'none' }}>
                   {parseBullets(pr.bullets).map((b, j) => (
                     <li key={j} style={{
-                      display:'flex', gap:'.45rem', fontSize:'.79rem', color:'#334155', lineHeight:1.6, marginBottom:'.04rem',
-                      pageBreakInside:'avoid', breakInside:'avoid',
+                      fontSize: '0.82rem', color: TEXT_RIGHT, lineHeight: 1.5,
+                      marginBottom: '0.2rem', position: 'relative'
                     }}>
-                      <span style={{ color: GREEN, fontFamily: MONO, flexShrink:0, fontSize:'.7rem', marginTop:'.06rem' }}>→</span>
+                      <span style={{ position: 'absolute', left: '-1rem', color: GOLD }}>•</span>
                       {b}
                     </li>
                   ))}
                 </ul>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* SKILLS — ATS: plain readable list + visual chips */}
-      {skills.length > 0 && (
-        <div style={{ marginBottom:'1.1rem', pageBreakInside:'avoid', breakInside:'avoid' }}>
-          <SH>Skills</SH>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:'.3rem' }}>
-            {skills.map((sk, i) => (
-              <span key={i} style={{
-                fontFamily: MONO, fontSize:'.67rem', background:'#f1f5f9',
-                border:'1px solid #cbd5e1', color:'#1e293b', borderRadius:'4px', padding:'.15rem .5rem',
-              }}>{sk}</span>
+              </div>
             ))}
-          </div>
-        </div>
-      )}
+          </section>
+        )}
 
-      {/* EDUCATION */}
-      {education.length > 0 && (
-        <div style={{ marginBottom:'1.1rem' }}>
-          <SH>Education</SH>
-          {education.map((e, i) => (
-            <div key={i} style={{
-              display:'flex', justifyContent:'space-between', alignItems:'flex-start',
-              gap:'.5rem', marginBottom:'.55rem',
-              pageBreakInside:'avoid', breakInside:'avoid',
-            }}>
-              <div>
-                <div style={{ fontWeight:700, color:'#0f172a', fontSize:'.82rem' }}>
-                  {[e.degree, e.field].filter(Boolean).join(' in ') || 'Degree'}
-                </div>
-                <div style={{ fontSize:'.72rem', color:'#475569', marginTop:'.03rem' }}>{e.institution}</div>
-                {e.gpa && <div style={{ fontSize:'.67rem', color:'#64748b' }}>CGPA: {e.gpa}</div>}
+        {/* AWARDS */}
+        {awards.length > 0 && (
+          <section style={{ marginBottom: '2rem' }}>
+            <RSH title="Awards & Recognitions" />
+            {awards.map((a, i) => (
+              <div key={i} style={{ marginBottom: '0.8rem' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: 700, color: DARK_NAVY }}>{a.name || a.title}</div>
+                <div style={{ fontSize: '0.8rem', color: '#666' }}>{a.issuer || a.organization} • {fmtDate(a.date)}</div>
               </div>
-              <div style={{
-                fontFamily: MONO, fontSize:'.62rem', color:'#94a3b8', whiteSpace:'nowrap',
-                flexShrink:0, background:'#f1f5f9', padding:'.1rem .4rem', borderRadius:'4px',
-              }}>
-                {e.start}{e.start && e.end ? ' – ' : ''}{e.end}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </section>
+        )}
 
-      {/* CERTIFICATIONS */}
-      {certifications.length > 0 && (
-        <div>
-          <SH>Certifications</SH>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:'.4rem' }}>
-            {certifications.map((c, i) => (
-              <div key={i} style={{
-                background: GREEN2, border:`1px solid #bbf7d0`, borderRadius:'6px', padding:'.3rem .65rem',
-                pageBreakInside:'avoid', breakInside:'avoid',
-              }}>
-                <div style={{ fontSize:'.72rem', fontWeight:700, color:'#14532d' }}>{c.name}</div>
-                {c.issuer && (
-                  <div style={{ fontSize:'.63rem', color:'#16a34a' }}>
-                    {c.issuer}{c.date ? ` · ${fmtM(c.date)}` : ''}
+        {/* EDUCATION */}
+        {education.length > 0 && (
+          <section>
+            <RSH title="Education" />
+            {education.map((e, i) => (
+              <div key={i} style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ fontWeight: 700, color: DARK_NAVY, fontSize: '0.95rem' }}>
+                    {[e.degree, e.field].filter(Boolean).join(' in ')}
                   </div>
-                )}
+                  <div style={{ fontSize: '0.75rem', color: '#666' }}>{e.start} — {e.end}</div>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: GOLD, fontWeight: 500 }}>{e.institution}</div>
+                {e.gpa && <div style={{ fontSize: '0.8rem', color: '#777' }}>GPA: {e.gpa}</div>}
               </div>
             ))}
-          </div>
-        </div>
-      )}
-
+          </section>
+        )}
+      </div>
     </div>
-  )
+  );
 }
+
+/* ── PDF Export Function ───────────────────────────────── */
+export async function exportTechPDF(data) {
+  const { jsPDF } = await import('jspdf');
+  const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+
+  const {
+    personal: p = {},
+    summary: s = {},
+    experience = [],
+    education = [],
+    skills = [],
+    projects = [],
+    certifications = [],
+    awards = [],
+    languages = [],
+  } = data || {};
+
+  const pageWidth = 210;
+  const pageHeight = 297;
+  const leftColWidth = pageWidth * 0.35;
+  const rightColWidth = pageWidth - leftColWidth;
+  const margin = 12;
+  const rightMarginLimit = pageWidth - 15; // Strict 15mm right margin
+
+  const GOLD_COLOR = [201, 168, 76]; // #C9A84C
+  const NAVY_COLOR = [26, 43, 60];  // #1A2B3C
+  const BLACK_COLOR = [34, 34, 34]; // #222222
+
+  let ly = 30; // Left column Y
+  let ry = 25; // Right column Y
+
+  // Helper: Draw Left Section Header
+  const drawLSH = (text) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...GOLD_COLOR);
+    doc.text(text.toUpperCase(), margin, ly, { charSpace: 1 });
+    ly += 1;
+    doc.setDrawColor(201, 168, 76, 75); // 0.3 opacity approx
+    doc.line(margin, ly, leftColWidth - margin, ly);
+    ly += 5;
+  };
+
+  // Helper: Draw Right Section Header
+  const drawRSH = (text) => {
+    if (ry > pageHeight - 30) { 
+      doc.addPage(); 
+      ry = 20; 
+      drawSidebarBg(); 
+    }
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...GOLD_COLOR);
+    doc.text(text.toUpperCase(), leftColWidth + 10, ry, { charSpace: 1 });
+    ry += 2;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(...GOLD_COLOR);
+    doc.line(leftColWidth + 10, ry, rightMarginLimit, ry);
+    ry += 7;
+  };
+
+  const drawSidebarBg = () => {
+    doc.setFillColor(...NAVY_COLOR);
+    doc.rect(0, 0, leftColWidth, pageHeight, 'F');
+  };
+
+  // 1. Sidebar Background
+  drawSidebarBg();
+
+  // Avatar Circle
+  doc.setFillColor(...GOLD_COLOR);
+  doc.circle(leftColWidth / 2, 20, 10, 'F');
+  doc.setFont('times', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(...NAVY_COLOR);
+  const initials = (p.name || '').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  doc.text(initials, leftColWidth / 2, 21, { align: 'center' });
+
+  ly = 40;
+  // Name
+  doc.setFont('times', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(255, 255, 255);
+  const nameLines = doc.splitTextToSize(p.name || 'Your Name', leftColWidth - (margin * 2));
+  doc.text(nameLines, leftColWidth / 2, ly, { align: 'center' });
+  ly += (nameLines.length * 7);
+
+  // Title
+  if (p.title) {
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(10);
+    doc.setTextColor(...GOLD_COLOR);
+    doc.text(p.title, leftColWidth / 2, ly, { align: 'center' });
+    ly += 10;
+  }
+
+  // Contact
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5);
+  doc.setTextColor(255, 255, 255);
+  const contactsArr = [
+    { l: 'EMAIL', v: p.email },
+    { l: 'PHONE', v: p.phone },
+    { l: 'ADDR', v: p.location },
+    { l: 'GIT', v: p.github }
+  ].filter(c => c.v);
+
+  contactsArr.forEach(c => {
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...GOLD_COLOR);
+    doc.text(c.l, margin, ly);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(255, 255, 255);
+    const valLines = doc.splitTextToSize(c.v, leftColWidth - margin - 25);
+    doc.text(valLines, margin + 12, ly);
+    ly += (valLines.length * 4) + 1;
+  });
+  ly += 5;
+
+  // About Me
+  if (s.text) {
+    drawLSH('About Me');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(230, 230, 230);
+    const sumLines = doc.splitTextToSize(s.text, leftColWidth - (margin * 2));
+    doc.text(sumLines, margin, ly);
+    ly += (sumLines.length * 4) + 8;
+  }
+
+  // Skills
+  if (skills.length > 0) {
+    drawLSH('Expertise');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(7);
+    let sx = margin;
+    skills.forEach(sk => {
+      const sw = doc.getTextWidth(sk) + 4;
+      if (sx + sw > leftColWidth - margin) { sx = margin; ly += 6; }
+      doc.setDrawColor(...GOLD_COLOR);
+      doc.roundedRect(sx, ly - 3, sw - 1, 4.5, 1, 1, 'D');
+      doc.text(sk, sx + 1.5, ly);
+      sx += sw;
+    });
+    ly += 10;
+  }
+
+  // Certifications
+  if (certifications.length > 0) {
+    drawLSH('Certificates');
+    certifications.forEach(c => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...GOLD_COLOR);
+      doc.text(c.name || '', margin, ly);
+      ly += 4;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(218, 218, 218); // Light grey for issuer
+      doc.text(c.issuer || '', margin, ly);
+      ly += 5;
+    });
+    ly += 5;
+  }
+
+  // Languages
+  if (languages && languages.length > 0) {
+    drawLSH('Languages');
+    languages.forEach(l => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7.5);
+      doc.setTextColor(255, 255, 255);
+      doc.text(l.name || l, margin, ly);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(6.5);
+      doc.setTextColor(...GOLD_COLOR);
+      doc.text(l.level || '', leftColWidth - margin, ly, { align: 'right' });
+      ly += 4.5;
+    });
+  }
+
+  // 2. Right Column Content (Experience -> Projects -> Awards -> Education)
+  // Experience
+  if (experience.length > 0) {
+    drawRSH('Work Experience');
+    experience.forEach(exp => {
+      if (ry > pageHeight - 30) { doc.addPage(); ry = 20; drawSidebarBg(); }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...NAVY_COLOR);
+      doc.text(exp.role || '', leftColWidth + 10, ry);
+      
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`${fmtDate(exp.start)} - ${exp.current ? 'Present' : fmtDate(exp.end)}`, rightMarginLimit, ry, { align: 'right' });
+      ry += 4.5;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...GOLD_COLOR);
+      doc.text(exp.company || '', leftColWidth + 10, ry);
+      ry += 5;
+
+      const bullets = parseBullets(exp.bullets);
+      bullets.forEach(b => {
+        const bl = doc.splitTextToSize(b, rightColWidth - 25);
+        if (ry + (bl.length * 4) > pageHeight - 15) { doc.addPage(); ry = 20; drawSidebarBg(); }
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(...BLACK_COLOR);
+        doc.text('\u2022', leftColWidth + 10, ry);
+        doc.text(bl, leftColWidth + 14, ry);
+        ry += (bl.length * 4.5);
+      });
+      ry += 4;
+    });
+  }
+
+  // Projects
+  if (projects.length > 0) {
+    drawRSH('Key Projects');
+    projects.forEach(pr => {
+      if (ry > pageHeight - 30) { doc.addPage(); ry = 20; drawSidebarBg(); }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(...NAVY_COLOR);
+      doc.text(pr.name || '', leftColWidth + 10, ry);
+      
+      if (pr.url) {
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(...GOLD_COLOR);
+        doc.text('Link', rightMarginLimit, ry, { align: 'right' });
+      }
+      ry += 4.5;
+
+      if (pr.tech) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text(pr.tech, leftColWidth + 10, ry);
+        ry += 4;
+      }
+
+      const bullets = parseBullets(pr.bullets);
+      bullets.forEach(b => {
+        const bl = doc.splitTextToSize(b, rightColWidth - 25);
+        if (ry + (bl.length * 4) > pageHeight - 15) { doc.addPage(); ry = 20; drawSidebarBg(); }
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...BLACK_COLOR);
+        doc.text('\u2022', leftColWidth + 10, ry);
+        doc.text(bl, leftColWidth + 14, ry);
+        ry += (bl.length * 4.5);
+      });
+      ry += 4;
+    });
+  }
+
+  // Awards
+  if (awards.length > 0) {
+    drawRSH('Awards & Recognitions');
+    awards.forEach(a => {
+      if (ry > pageHeight - 30) { doc.addPage(); ry = 20; drawSidebarBg(); }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...NAVY_COLOR);
+      doc.text(a.name || a.title || '', leftColWidth + 10, ry);
+      ry += 4;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.text(`${a.issuer || a.organization || ''} • ${fmtDate(a.date)}`, leftColWidth + 10, ry);
+      ry += 6;
+    });
+  }
+
+  // Education
+  if (education.length > 0) {
+    drawRSH('Education');
+    education.forEach(e => {
+      if (ry > pageHeight - 30) { doc.addPage(); ry = 20; drawSidebarBg(); }
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...NAVY_COLOR);
+      const degree = [e.degree, e.field].filter(Boolean).join(' in ');
+      doc.text(degree, leftColWidth + 10, ry);
+      
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`${e.start} - ${e.end}`, rightMarginLimit, ry, { align: 'right' });
+      ry += 4.5;
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...GOLD_COLOR);
+      doc.text(e.institution || '', leftColWidth + 10, ry);
+      ry += 8;
+    });
+  }
+
+  doc.save(`${(p.name || 'resume').replace(/\s+/g, '_')}_Tech.pdf`);
+}
+
+// Keep exportToPDF pointer for backward compatibility if needed, 
+// though user asked for exportTechPDF specifically.
+export const exportToPDF = exportTechPDF;

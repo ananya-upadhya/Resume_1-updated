@@ -99,9 +99,10 @@ async def export_pdf(data: ResumeData):
     PALETTES = {
         "classic":   {"accent": colors.HexColor("#0a0a0a"), "sub": colors.HexColor("#555555"), "bullet": "–"},
         "modern":    {"accent": colors.HexColor("#2563eb"), "sub": colors.HexColor("#475569"), "bullet": "▸"},
-        "tech":      {"accent": colors.HexColor("#16a34a"), "sub": colors.HexColor("#334155"), "bullet": "→"},
-        "executive": {"accent": colors.HexColor("#1e3a5f"), "sub": colors.HexColor("#b8860b"), "bullet": "◆"},
+        "tech":      {"accent": colors.HexColor("#C9A84C"), "sub": colors.HexColor("#1A2B3C"), "bullet": "→"},
+        "executive": {"accent": colors.HexColor("#111111"), "sub": colors.HexColor("#555555"), "bullet": "◆"},
         "etherx":    {"accent": colors.HexColor("#A07830"), "sub": colors.HexColor("#C9A84C"), "bullet": "◆"},
+        "student":   {"accent": colors.HexColor("#C85A38"), "sub": colors.HexColor("#777777"), "bullet": "•"},
     }
     pal = PALETTES.get(tid, PALETTES["classic"])
 
@@ -255,9 +256,10 @@ async def export_docx(data: ResumeData):
     PALETTES = {
         "classic":   {"accent": (10,10,10),      "sub": (85,85,85),    "bullet": "–",  "center": True},
         "modern":    {"accent": (37,99,235),     "sub": (71,85,105),   "bullet": "▸",  "center": False},
-        "tech":      {"accent": (22,163,74),     "sub": (51,65,85),    "bullet": "→",  "center": False},
-        "executive": {"accent": (30,58,95),      "sub": (184,134,11),  "bullet": "◆",  "center": False},
+        "tech":      {"accent": (201,168,76),    "sub": (26,43,60),    "bullet": "→",  "center": False},
+        "executive": {"accent": (17,17,17),      "sub": (85,85,85),    "bullet": "◆",  "center": False},
         "etherx":    {"accent": (160,120,48),    "sub": (201,168,76),  "bullet": "◆",  "center": False},
+        "student":   {"accent": (200,90,56),     "sub": (119,119,119), "bullet": "•",  "center": False},
     }
     pal = PALETTES.get(tid, PALETTES["classic"])
 

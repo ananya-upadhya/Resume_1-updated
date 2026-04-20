@@ -41,12 +41,14 @@ def _parse_json(content: str) -> Dict[str, Any]:
 # ──────────────────────────────────────────────────────────────────
 # GROQ PROVIDER  (active)
 # ──────────────────────────────────────────────────────────────────
-async def _call_groq(prompt: str, temperature: float) -> Dict[str, Any]:
-    if not settings.GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY is not set in environment variables.")
-    from groq import AsyncGroq # pip install groq>=0.4.0
-    client = AsyncGroq(api_key=settings.GROQ_API_KEY)
-    response = await client.chat.completions.create(
+def _call_groq(prompt: str, temperature: float) -> Dict[str, Any]:
+    if not settings.GROQ_API_KEY or settings.GROQ_API_KEY.startswith("paste-"):
+        raise ValueError(
+            "GROQ_API_KEY is not configured. Set a valid key in .env to enable LLM features."
+        )
+    from groq import Groq  # pip install groq>=0.4.0
+    client = Groq(api_key=settings.GROQ_API_KEY)
+    response = client.chat.completions.create(
         model=settings.LLM_MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=temperature,
@@ -57,45 +59,48 @@ async def _call_groq(prompt: str, temperature: float) -> Dict[str, Any]:
     return _parse_json(content)
 
 
-async def _call_groq_text(system_prompt: str, user_prompt: str, temperature: float) -> str:
-    if not settings.GROQ_API_KEY:
-        raise ValueError("GROQ_API_KEY is not set in environment variables.")
-    from groq import AsyncGroq
-    client = AsyncGroq(api_key=settings.GROQ_API_KEY)
-    messages = []
-    if system_prompt:
-        messages.append({"role": "system", "content": system_prompt})
-    messages.append({"role": "user", "content": user_prompt})
-
-    response = await client.chat.completions.create(
-        model=settings.LLM_MODEL,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=1000,
-    )
-    return response.choices[0].message.content or ""
-
-
 # ──────────────────────────────────────────────────────────────────
 # CLAUDE PROVIDER  (prepared — uncomment when ready)
+# Step 1: pip install anthropic
+# Step 2: In .env set LLM_PROVIDER=claude, ANTHROPIC_API_KEY=..., LLM_MODEL=claude-sonnet-4-20250514
+# Step 3: Restart server — zero other file changes
 # ──────────────────────────────────────────────────────────────────
-async def _call_claude(prompt: str, temperature: float) -> Dict[str, Any]:
-    raise NotImplementedError("Claude provider not yet activated.")
-
-
-async def _call_claude_text(system_prompt: str, user_prompt: str, temperature: float) -> str:
-    raise NotImplementedError("Claude provider not yet activated.")
+def _call_claude(prompt: str, temperature: float) -> Dict[str, Any]:
+    raise NotImplementedError(
+        "Claude provider not yet activated. "
+        "pip install anthropic, set LLM_PROVIDER=claude and ANTHROPIC_API_KEY in .env."
+    )
+    # --- Uncomment below when ready ---
+    # import anthropic
+    # client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+    # response = client.messages.create(
+    #     model=settings.LLM_MODEL,
+    #     max_tokens=1000,
+    #     temperature=temperature,
+    #     messages=[{"role": "user", "content": prompt}],
+    # )
+    # return _parse_json(response.content[0].text)
 
 
 # ──────────────────────────────────────────────────────────────────
 # OLLAMA PROVIDER  (prepared — uncomment for self-hosted)
+# Step 1: Install Ollama, run: ollama pull llama3.2
+# Step 2: In .env set LLM_PROVIDER=ollama, LLM_MODEL=llama3.2
+# Step 3: Restart server — zero other file changes
 # ──────────────────────────────────────────────────────────────────
-async def _call_ollama(prompt: str, temperature: float) -> Dict[str, Any]:
-    raise NotImplementedError("Ollama provider not yet activated.")
-
-
-async def _call_ollama_text(system_prompt: str, user_prompt: str, temperature: float) -> str:
-    raise NotImplementedError("Ollama provider not yet activated.")
+def _call_ollama(prompt: str, temperature: float) -> Dict[str, Any]:
+    raise NotImplementedError(
+        "Ollama provider not yet activated. "
+        "Install Ollama locally, set LLM_PROVIDER=ollama in .env."
+    )
+    # --- Uncomment below when ready ---
+    # import ollama
+    # response = ollama.chat(
+    #     model=settings.LLM_MODEL,
+    #     messages=[{"role": "user", "content": prompt}],
+    #     options={"temperature": temperature},
+    # )
+    # return _parse_json(response["message"]["content"])
 
 
 # ──────────────────────────────────────────────────────────────────
@@ -107,32 +112,18 @@ _PROVIDERS = {
     "ollama": _call_ollama,
 }
 
-_PROVIDERS_TEXT = {
-    "groq": _call_groq_text,
-    "claude": _call_claude_text,
-    "ollama": _call_ollama_text,
-}
 
-
-async def call_llm(prompt: str, temperature: float = 0.3) -> Dict[str, Any]:
+def call_llm(prompt: str, temperature: float = 0.3) -> Dict[str, Any]:
     """
-    Route prompt to the configured LLM provider (JSON response).
+    Route prompt to the configured LLM provider.
+    Provider is selected via settings.LLM_PROVIDER (.env only).
+    Raises on failure — callers must wrap in try/except with fallback.
     """
     provider = settings.LLM_PROVIDER.lower()
     handler = _PROVIDERS.get(provider)
     if not handler:
-        raise ValueError(f"Unknown LLM_PROVIDER='{provider}'")
-    logger.info(f"Calling LLM provider={provider} (JSON)")
-    return await handler(prompt, temperature)
-
-
-async def call_llm_text(system_prompt: str, user_prompt: str, temperature: float = 0.7) -> str:
-    """
-    Route prompt to the configured LLM provider (Plain text response).
-    """
-    provider = settings.LLM_PROVIDER.lower()
-    handler = _PROVIDERS_TEXT.get(provider)
-    if not handler:
-        raise ValueError(f"Unknown LLM_PROVIDER='{provider}'")
-    logger.info(f"Calling LLM provider={provider} (TEXT)")
-    return await handler(system_prompt, user_prompt, temperature)
+        raise ValueError(
+            f"Unknown LLM_PROVIDER='{provider}'. Valid options: groq, claude, ollama"
+        )
+    logger.info(f"Calling LLM provider={provider} model={settings.LLM_MODEL}")
+    return handler(prompt, temperature)

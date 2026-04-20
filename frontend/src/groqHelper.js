@@ -30,87 +30,87 @@ export const ENHANCERS = {
 
     // Personal fields
     name: (v) => callGroq(
-        `You are a resume formatting expert. Given a person's name, return it properly capitalised and formatted for a professional resume. Return only the formatted name, nothing else.`,
-        `Format this name: ${v}`
+        `You are a resume formatting expert. Format the provided name properly capitalised for a professional resume. Return ONLY the formatted name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     title: (v) => callGroq(
-        `You are a resume expert. Given a job title, return the most ATS-optimised, industry-standard version of it. Return only the improved title, nothing else.`,
-        `Improve this job title for ATS: ${v}`
+        `You are a resume expert. Improve the provided job title for ATS, making it industry-standard. Return ONLY the improved title, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     location: (v) => callGroq(
-        `You are a resume expert. Given a location, return it in standard professional resume format (City, State/Country). Return only the formatted location.`,
-        `Format this location: ${v}`
+        `You are a resume expert. Format the provided location in standard professional resume format (City, State/Country). Return ONLY the formatted location, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     linkedin: (v) => callGroq(
-        `You are a resume expert. Given a LinkedIn URL or username, return the clean standard format: linkedin.com/in/username. Return only the URL.`,
-        `Clean this LinkedIn: ${v}`
+        `You are a resume expert. Clean the provided LinkedIn URL or username to the standard format: linkedin.com/in/username. Return ONLY the URL, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     github: (v) => callGroq(
-        `You are a resume expert. Given a GitHub URL or username, return clean format: github.com/username. Return only the URL.`,
-        `Clean this GitHub: ${v}`
+        `You are a resume expert. Clean the provided GitHub URL or username to the standard format: github.com/username. Return ONLY the URL, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 
     // Summary
     summary: (v, ctx) => callGroq(
-        `You are a professional resume writer. Enhance the summary to be ATS-friendly, impactful, 3-4 sentences. No "I". Strong action words. Return only the enhanced text, no labels or quotes.`,
-        `Enhance this summary${ctx?.name ? ` for ${ctx.name}` : ""}${ctx?.title ? ` applying as ${ctx.title}` : ""}:\n\n${v}`
+        `You are a professional resume writer. Enhance the provided summary${ctx?.name ? ` for ${ctx.name}` : ""}${ctx?.title ? ` applying as ${ctx.title}` : ""} to be ATS-friendly, impactful, 3-4 sentences. No "I". Strong action words. Return ONLY the rewritten summary text. No introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 
     // Experience
     role: (v, ctx) => callGroq(
-        `You are a resume expert. Given a job role/title, return the most ATS-optimised, industry-standard version. Return only the improved title.`,
-        `Improve this role title for ATS at ${ctx?.company || "a company"}: ${v}`
+        `You are a resume expert. Improve the provided job role/title${ctx?.company ? ` at ${ctx.company}` : ""} for ATS, making it industry-standard. Return ONLY the improved title, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     company: (v) => callGroq(
-        `You are a resume expert. Given a company name, return it properly formatted and capitalised as it would appear on a professional resume. Return only the name.`,
-        `Format this company name: ${v}`
+        `You are a resume expert. Format the provided company name properly capitalised as it would appear on a professional resume. Return ONLY the formatted name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     bullets: (v, ctx) => callGroq(
-        `You are a professional resume writer. Rewrite these bullet points to be ATS-friendly with strong action verbs and quantified impact. Keep same number of bullets. Return only bullet lines starting with -, nothing else.`,
-        `Rewrite bullets for ${ctx?.role || "a professional"} at ${ctx?.company || "a company"}:\n\n${v}`
+        `You are a professional resume writer. Rewrite the provided bullet points${ctx?.role ? ` for ${ctx.role}` : ""}${ctx?.company ? ` at ${ctx.company}` : ""} to be ATS-friendly with strong action verbs and quantified impact. Keep same number of bullets. Return ONLY bullet lines starting with -, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 
     // Education
     institution: (v) => callGroq(
-        `You are a resume expert. Given a college/university name, return it properly capitalised and formatted. Return only the name.`,
-        `Format this institution name: ${v}`
+        `You are a resume expert. Format the provided college/university name properly capitalised. Return ONLY the formatted name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     degree: (v) => callGroq(
-        `You are a resume expert. Given a degree name, return the standard abbreviated professional format (e.g. B.E., B.Tech, M.S., MBA). Return only the formatted degree.`,
-        `Format this degree: ${v}`
+        `You are a resume expert. Format the provided degree name into standard abbreviated professional format (e.g. B.E., B.Tech, M.S., MBA). Return ONLY the formatted degree, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     field: (v) => callGroq(
-        `You are a resume expert. Given a field of study, return the properly capitalised standard academic name. Return only the field name.`,
-        `Format this field of study: ${v}`
+        `You are a resume expert. Format the provided field of study properly capitalised with standard academic name. Return ONLY the formatted field name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 
     // Skills
     skills: (v, ctx) => callGroq(
-        `You are a resume expert. Given a list of skills, return an improved comma-separated list — fix casing (javascript → JavaScript, css → CSS), remove duplicates, add 2-3 relevant missing skills. Return only comma-separated skill names.`,
-        `Improve these skills for ${ctx?.title || "a software professional"}: ${Array.isArray(v) ? v.join(", ") : v}`
+        `You are a resume expert. Improve the provided skills list${ctx?.title ? ` for ${ctx.title}` : ""} — fix casing (javascript → JavaScript, css → CSS), remove duplicates, add 2-3 relevant missing skills. Return ONLY a comma-separated list of skill names, no introductory text, labels, or echoing of the prompt.`,
+        Array.isArray(v) ? v.join(", ") : v
     ),
 
     // Projects
     projectName: (v) => callGroq(
-        `You are a resume expert. Given a project name, return a clear, professional, impactful version suitable for a resume. Return only the project name.`,
-        `Improve this project name: ${v}`
+        `You are a resume expert. Improve the provided project name to be clear, professional, and impactful. Return ONLY the improved project name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     tech: (v) => callGroq(
-        `You are a resume expert. Given a tech stack string, return it properly formatted with correct capitalisation and ordering (languages first, then frameworks, then tools). Return only the formatted tech stack.`,
-        `Format this tech stack: ${v}`
+        `You are a resume expert. Format the provided tech stack properly capitalised and ordered (languages first, then frameworks, then tools). Return ONLY the formatted tech stack, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     projectBullets: (v, ctx) => callGroq(
-        `You are a professional resume writer. Rewrite this project description as ATS-friendly bullet points with strong action verbs and clear outcomes. Return only bullet lines starting with -.`,
-        `Rewrite project description for "${ctx?.name || "a project"}" using ${ctx?.tech || "various technologies"}:\n\n${v}`
+        `You are a professional resume writer. Rewrite the provided project description${ctx?.name ? ` for "${ctx.name}"` : ""}${ctx?.tech ? ` using ${ctx.tech}` : ""} as ATS-friendly bullet points with strong action verbs and clear outcomes. Return ONLY bullet lines starting with -, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 
     // Certifications
     certName: (v) => callGroq(
-        `You are a resume expert. Given a certification name, return the full official properly capitalised name. Return only the certification name.`,
-        `Format this certification name: ${v}`
+        `You are a resume expert. Format the provided certification name by returning the full official properly capitalised name. Return ONLY the certification name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
     certIssuer: (v) => callGroq(
-        `You are a resume expert. Given a certification issuer, return the full official organisation name properly capitalised. Return only the name.`,
-        `Format this issuer name: ${v}`
+        `You are a resume expert. Format the provided certification issuer by returning the full official organisation name properly capitalised. Return ONLY the issuer name, no introductory text, labels, or echoing of the prompt.`,
+        v
     ),
 };
