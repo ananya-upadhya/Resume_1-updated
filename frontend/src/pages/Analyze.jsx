@@ -274,14 +274,25 @@ export default function Analyze() {
           }
         }
       `}</style>
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Resume Analyzer</h1>
-        <p className="mt-2 text-sm md:text-base" style={{ color: 'rgba(201,168,76,0.8)' }}>
-          {hasStoredResume && !file 
-            ? "Your saved resume is ready to analyze. You can also upload a different file."
-            : "Upload a resume or provide job context to generate intelligence scoring."
-          }
-        </p>
+      <div className="flex items-start md:items-center gap-3 mb-2">
+        <button 
+          onClick={() => window.location.href = '/'}
+          className="md:hidden mt-1 flex items-center justify-center p-2 rounded-md bg-[rgba(201,168,76,0.1)] hover:bg-[rgba(201,168,76,0.2)] transition-colors border border-[rgba(201,168,76,0.2)] shrink-0"
+          aria-label="Back to home"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-gold)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight" style={{ color: 'var(--accent-gold)' }}>Resume Analyzer</h1>
+          <p className="mt-2 text-sm md:text-base" style={{ color: 'rgba(201,168,76,0.8)' }}>
+            {hasStoredResume && !file 
+              ? "Your saved resume is ready to analyze. You can also upload a different file."
+              : "Upload a resume or provide job context to generate intelligence scoring."
+            }
+          </p>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">
