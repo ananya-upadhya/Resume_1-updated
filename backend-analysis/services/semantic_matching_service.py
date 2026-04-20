@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 try:
     from sentence_transformers import SentenceTransformer
     from sklearn.metrics.pairwise import cosine_similarity
+    import torch
+    torch.set_num_threads(1)
     _TRANSFORMERS_AVAILABLE = True
 except ImportError:
     SentenceTransformer = None

@@ -1,4 +1,12 @@
 # main.py
+import os
+# Limit threads to reduce memory usage on 512MB RAM machines like Render Free
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["VECLIB_MAXIMUM_THREADS"] = "1"
+os.environ["NUMEXPR_NUM_THREADS"] = "1"
+
 import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
