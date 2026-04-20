@@ -30,6 +30,8 @@ app.add_middleware(
 
 # ── Models ────────────────────────────────────────────────────────────────────
 
+from typing import List, Union
+
 class Personal(BaseModel):
     name:str=""; title:str=""; email:str=""; phone:str=""
     location:str=""; linkedin:str=""; github:str=""; website:str=""
@@ -39,14 +41,14 @@ class Summary(BaseModel):
 
 class Experience(BaseModel):
     id:str=""; company:str=""; role:str=""
-    start:str=""; end:str=""; current:bool=False; bullets: List[str] = []
+    start:str=""; end:str=""; current:bool=False; bullets: Union[List[str], str] = []
 
 class Education(BaseModel):
     id:str=""; institution:str=""; degree:str=""
     field:str=""; start:str=""; end:str=""; gpa:str=""
 
 class Project(BaseModel):
-    id:str=""; name:str=""; tech:str=""; url:str=""; bullets: List[str] = []
+    id:str=""; name:str=""; tech:str=""; url:str=""; bullets: Union[List[str], str] = []
 
 class Certification(BaseModel):
     id:str=""; name:str=""; issuer:str=""; date:str=""
