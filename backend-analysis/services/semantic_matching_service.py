@@ -12,22 +12,26 @@ from typing import Dict, Any, List
 logger = logging.getLogger(__name__)
 
 try:
-    from sentence_transformers import SentenceTransformer
-    from sklearn.metrics.pairwise import cosine_similarity
-    import torch
-    torch.set_num_threads(1)
+    from fastembed import TextEmbedding
     _TRANSFORMERS_AVAILABLE = True
 except ImportError:
-    SentenceTransformer = None
-    cosine_similarity = None
+    TextEmbedding = None
     _TRANSFORMERS_AVAILABLE = False
-    logger.warning("sentence-transformers or scikit-learn not installed. Semantic matching will return 0.0")
+    logger.warning("fastembed not installed. Semantic matching will return 0.0")
+
+
+def cosine_similarity_numpy(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+    """Pure numpy cosine similarity to replace sklearn.metrics.pairwise.cosine_similarity"""
+    # A: [N, D], B: [M, D] -> Output: [N, M]
+    a_norm = np.linalg.norm(A, axis=1, keepdims=True)
+    b_norm = np.linalg.norm(B, axis=1, keepdims=True)
+    return np.dot(A, B.T) / (a_norm * b_norm.T + 1e-9)
 
 
 class SemanticMatchingService:
     """
-    Local MiniLM-based semantic matcher.
-    No LLM calls — all inference is on-device using sentence-transformers.
+    Local FastEmbed-based semantic matcher (ONNX Runtime).
+    Ultra-low memory footprint compared to PyTorch/SentenceTransformers.
     """
 
     def __init__(self):
@@ -35,9 +39,10 @@ class SemanticMatchingService:
 
     def _load_model(self):
         if self._model is None and _TRANSFORMERS_AVAILABLE:
-            logger.info("Loading MiniLM model (all-MiniLM-L6-v2)…")
-            self._model = SentenceTransformer("all-MiniLM-L6-v2")
-            logger.info("MiniLM model loaded.")
+            logger.info("Loading FastEmbed model (BAAI/bge-small-en-v1.5)…")
+            # Using bge-small-en-v1.5 as it is extremely efficient and accurate
+            self._model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+            logger.info("FastEmbed model loaded.")
 
     @staticmethod
     def _split_sentences(text: str, max_sentences: int = 30) -> List[str]:
@@ -79,12 +84,12 @@ class SemanticMatchingService:
                 "General software engineering skills"
             ]
 
-        # Encode both sides
-        resume_embeddings = self._model.encode(resume_sentences, show_progress_bar=False)
-        role_embeddings = self._model.encode(responsibilities, show_progress_bar=False)
+        # Encode both sides (TextEmbedding.embed returns a generator of numpy arrays)
+        resume_embeddings = np.array(list(self._model.embed(resume_sentences)))
+        role_embeddings = np.array(list(self._model.embed(responsibilities)))
 
         # Compute full similarity matrix  [n_resume_sents × n_responsibilities]
-        sim_matrix = cosine_similarity(resume_embeddings, role_embeddings)
+        sim_matrix = cosine_similarity_numpy(resume_embeddings, role_embeddings)
 
         # Overall fit = mean of top-k maximum similarities per responsibility
         per_resp_max = np.max(sim_matrix, axis=0)             # best resume match for each responsibility

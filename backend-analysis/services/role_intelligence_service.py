@@ -7,12 +7,19 @@ from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
-# Load spaCy model
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    import en_core_web_sm
-    nlp = en_core_web_sm.load()
+# Global variable for lazy loading
+_nlp_instance = None
+
+def get_nlp():
+    """Lazy-load spaCy model on demand."""
+    global _nlp_instance
+    if _nlp_instance is None:
+        try:
+            _nlp_instance = spacy.load("en_core_web_sm")
+        except OSError:
+            import en_core_web_sm
+            _nlp_instance = en_core_web_sm.load()
+    return _nlp_instance
 
 # Predefined dictionaries according to specification
 SKILLS_DICTIONARY = {
@@ -100,6 +107,7 @@ class RoleIntelligenceService:
 
     @staticmethod
     def extract_responsibilities(text: str) -> List[str]:
+        nlp = get_nlp()
         doc = nlp(text)
         responsibilities = []
         

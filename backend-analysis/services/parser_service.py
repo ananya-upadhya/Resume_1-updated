@@ -7,12 +7,32 @@ import docx
 from typing import Optional, List, Dict, Any
 from schemas.resume_schema import ParsedResume, ExperienceItem, EducationItem, ProjectItem
 
-# Load spaCy model
-try:
-    nlp = spacy.load("en_core_web_sm")
-except OSError:
-    import en_core_web_sm
-    nlp = en_core_web_sm.load()
+# Global variable to hold the model instance for lazy loading
+_nlp_instance = None
+
+def get_nlp():
+    """Lazy-load spaCy model to save memory during startup."""
+    global _nlp_instance
+    if _nlp_instance is None:
+        try:
+            # Load with minimal components to save RAM
+            _nlp_instance = spacy.load("en_core_web_sm", disable=["ner", "parser", "lemmatizer", "attribute_ruler"])
+            # Or if you need NER later, you can enable just what's needed
+        except OSError:
+            import en_core_web_sm
+            _nlp_instance = en_core_web_sm.load()
+    return _nlp_instance
+
+def get_nlp_full():
+    """Lazy-load full spaCy model for NER tasks (company/org extraction)."""
+    global _nlp_instance_full
+    if "_nlp_instance_full" not in globals() or globals()["_nlp_instance_full"] is None:
+        try:
+            globals()["_nlp_instance_full"] = spacy.load("en_core_web_sm")
+        except OSError:
+            import en_core_web_sm
+            globals()["_nlp_instance_full"] = en_core_web_sm.load()
+    return globals()["_nlp_instance_full"]
 
 SKILL_DICTIONARY = {
     "react", "javascript", "python", "node", "aws", "docker", "sql",
@@ -63,6 +83,7 @@ class ParserService:
 
     @staticmethod
     def extract_skills(text: str) -> List[str]:
+        nlp = get_nlp()
         doc = nlp(text.lower())
         skills_found = set()
         for token in doc:
@@ -110,11 +131,12 @@ class ParserService:
                                 current_company = title_match.group(1).strip()
                                 current_role = title_match.group(2).strip()
                             else:
-                                current_role = clean_line
-                                doc_line = nlp(clean_line)
-                                for ent in doc_line.ents:
-                                    if ent.label_ == "ORG" and not current_company:
-                                        current_company = ent.text
+                                 current_role = clean_line
+                                 nlp_full = get_nlp_full()
+                                 doc_line = nlp_full(clean_line)
+                                 for ent in doc_line.ents:
+                                     if ent.label_ == "ORG" and not current_company:
+                                         current_company = ent.text
                         elif not current_company:
                              current_company = clean_line
         if (current_role or current_company) and current_bullets:
@@ -202,7 +224,8 @@ class ParserService:
         projects = cls.extract_projects(cleaned_text)
         
         if not experience or all(not e.bullets for e in experience):
-            doc = nlp(cleaned_text)
+            nlp_full = get_nlp_full()
+            doc = nlp_full(cleaned_text)
             fallback_bullets = []
             for sent in doc.sents:
                 clean_sent = sent.text.strip()
