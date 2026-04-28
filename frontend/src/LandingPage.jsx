@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { ClipboardList, Eye, FileSearch, FileText } from "lucide-react";
 
 const STYLES = `
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -40,7 +41,7 @@ const STYLES = `
   }
   .lp-logo-sub {
     font-size:.55rem; letter-spacing:.2em; text-transform:uppercase;
-    color:#6B5A3A; margin-top:.1rem;
+    color:#E8C060; margin-top:.1rem;
   }
   .lp-nav-badge {
     font-size:.62rem; font-weight:600; letter-spacing:.1em;
@@ -83,7 +84,7 @@ const STYLES = `
   .lp-sub {
     font-family:'Inter',sans-serif;
     font-size:clamp(1rem,2vw,1.25rem);
-    color:#C8B090; font-style:italic;
+    color:#C8B090;
     max-width:540px; line-height:1.7;
     animation: fadeIn .7s ease .2s both;
   }
@@ -179,7 +180,11 @@ const STYLES = `
 const FEATURES = [
   { ico: "📋", title: "7-Step Builder", desc: "Structured sections guide you from personal info to certifications." },
   { ico: "👁", title: "Live Preview", desc: "See your resume update in real time as you type." },
-  { ico: "🎯", title: "ATS Checker", desc: "Score your resume and fix issues before applying." },
+  {
+    ico: <FileSearch size={22} strokeWidth={1.5} />,
+    title: "ATS Checker",
+    desc: "Score your resume and fix issues before applying."
+  },
   { ico: "📄", title: "PDF & Word Export", desc: "Download in both formats with one click." },
 ];
 
@@ -209,7 +214,7 @@ export default function LandingPage() {
                 <div className="lp-logo-sub">Smart Resume Intelligence</div>
               </div>
             </div>
-            <div className="lp-nav-badge">Module 1 — Resume Suite</div>
+            <div className="lp-nav-badge">EtherX — Resume Suite</div>
           </nav>
 
           {/* Hero */}
@@ -252,7 +257,7 @@ export default function LandingPage() {
                 Analyze My Resume →
               </button>
               <div className="lp-cta-hint">
-                No sign-up · No API keys · 100% free
+                No sign-up · 100% free · Quick Analysis
               </div>
             </div>
 

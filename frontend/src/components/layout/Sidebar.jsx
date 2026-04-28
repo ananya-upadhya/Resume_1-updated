@@ -143,34 +143,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* ─── Footer ───────────────────────────────────────────── */}
-      <div
-        style={{
-          padding: '1rem 1.25rem',
-          borderTop: '1px solid var(--border-color)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-        }}
-      >
-        <div
-          style={{
-            width: '30px', height: '30px',
-            borderRadius: '50%',
-            background: 'rgba(201,168,76,0.15)',
-            border: '1px solid rgba(201,168,76,0.3)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: GOLD, fontWeight: 700, fontSize: '0.8rem',
-            flexShrink: 0,
-          }}
-        >
-          U
-        </div>
-        <div style={{ minWidth: 0 }}>
-          <p style={{ fontSize: '0.78rem', fontWeight: 500, color: 'var(--text-primary)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>User Access</p>
-          <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', margin: 0 }}>Free Tier</p>
-        </div>
-      </div>
+
     </motion.aside>
   )
 }

@@ -225,10 +225,10 @@ const STYLES = `
     --bg-foot:     #0A0A0A;
 
     --tx-primary:   #F0E4C0;
-    --tx-secondary: #BEA878;
-    --tx-muted:     #5C4E34;
-    --tx-input:     #E0D0A8;
-    --tx-ph:        #2E2616;
+    --tx-secondary: #F0E4C0;
+    --tx-muted:     #9A8660;
+    --tx-input:     #f9f8f2ff;
+    --tx-ph:        #ead2a5ff;
 
     --bd:           rgba(201,168,76,0.14);
     --bd-input:     rgba(201,168,76,0.18);
@@ -258,7 +258,7 @@ const STYLES = `
     --sh-glow:   0 0 30px rgba(201,168,76,0.08);
 
     --prog-track:  rgba(201,168,76,0.12);
-    --lbl-color:   #7A6040;
+    --lbl-color:   #BEA878;
     --req-color:   #C9A84C;
 
     --ni-active-bg:  rgba(201,168,76,0.09);
@@ -273,7 +273,7 @@ const STYLES = `
     --tip-bl:      #C9A84C;
     --tip-bg:      rgba(201,168,76,0.04);
     --tip-bd:      rgba(201,168,76,0.15);
-    --tip-tx:      #8A7050;
+    --tip-tx:      #BEA878;
     --tip-b:       #D4B86A;
 
     --tag-bg:    rgba(201,168,76,0.09);
@@ -286,7 +286,7 @@ const STYLES = `
     --banner-err-bg:  rgba(217,107,90,0.07);  --banner-err-tx:  #D96B5A; --banner-err-bd:  rgba(217,107,90,0.22);
 
     --prev-bar-bg:  #0A0A0A;
-    --prev-ttl:     #4A3C28;
+    --prev-ttl:     #C9A84C;
     --live-color:   #C9A84C;
     --live-dot:     #E8C060;
 
@@ -912,30 +912,30 @@ const LogoMark = () => (
   <img
     src="/logo_dark.jpg"
     alt="EtherX"
-    style={{ width:"30px", height:"30px", objectFit:"contain" }}
+    style={{ width: "30px", height: "30px", objectFit: "contain" }}
   />
 );
 
 /* ─── Data init ─────────────────────────────────── */
 const INIT = {
-  personal: { name:"", title:"", email:"", phone:"", location:"", linkedin:"", github:"", website:"" },
-  summary: { text:"" },
+  personal: { name: "", title: "", email: "", phone: "", location: "", linkedin: "", github: "", website: "" },
+  summary: { text: "" },
   experience: [], education: [], skills: [], projects: [], certifications: [],
 };
-const uid = () => String(Date.now()) + String(Math.random()).slice(2,7);
-const newExp  = () => ({ id:uid(), company:"", role:"", start:"", end:"", current:false, bullets:"" });
-const newEdu  = () => ({ id:uid(), institution:"", degree:"", field:"", start:"", end:"", gpa:"" });
-const newProj = () => ({ id:uid(), name:"", tech:"", url:"", bullets:"" });
-const newCert = () => ({ id:uid(), name:"", issuer:"", date:"" });
+const uid = () => String(Date.now()) + String(Math.random()).slice(2, 7);
+const newExp = () => ({ id: uid(), company: "", role: "", start: "", end: "", current: false, bullets: "" });
+const newEdu = () => ({ id: uid(), institution: "", degree: "", field: "", start: "", end: "", gpa: "" });
+const newProj = () => ({ id: uid(), name: "", tech: "", url: "", bullets: "" });
+const newCert = () => ({ id: uid(), name: "", issuer: "", date: "" });
 
 const STEPS = [
-  { key:"personal",       label:"Personal Info"   },
-  { key:"summary",        label:"Summary"         },
-  { key:"experience",     label:"Experience"      },
-  { key:"education",      label:"Education"       },
-  { key:"skills",         label:"Skills"          },
-  { key:"projects",       label:"Projects"        },
-  { key:"certifications", label:"Certifications"  },
+  { key: "personal", label: "Personal Info" },
+  { key: "summary", label: "Summary" },
+  { key: "experience", label: "Experience" },
+  { key: "education", label: "Education" },
+  { key: "skills", label: "Skills" },
+  { key: "projects", label: "Projects" },
+  { key: "certifications", label: "Certifications" },
 ];
 const SUBS = [
   "Name, contact details & links",
@@ -949,46 +949,46 @@ const SUBS = [
 /* Step icons — SVG-based, no emoji */
 const StepIcon = ({ i }) => {
   const icons = [
-    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>,
-    <path d="M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z"/>,
-    <path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 9H7v-2h8v2zm3-4H7V9h11v2z"/>,
-    <path d="M12 3L1 9l11 6 9-4.9V17h2V9L12 3zm-1 12.99L5 13l6 3.49 6-3.49-6 3.49z"/>,
-    <path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z"/>,
-    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>,
-    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/>,
+    <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />,
+    <path d="M4 4h16v2H4zm0 6h16v2H4zm0 6h10v2H4z" />,
+    <path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 9H7v-2h8v2zm3-4H7V9h11v2z" />,
+    <path d="M12 3L1 9l11 6 9-4.9V17h2V9L12 3zm-1 12.99L5 13l6 3.49 6-3.49-6 3.49z" />,
+    <path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z" />,
+    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />,
+    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z" />,
   ];
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor" style={{width:"12px",height:"12px",opacity:.7}}>
+    <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: "12px", height: "12px", opacity: .7 }}>
       {icons[i]}
     </svg>
   );
 };
 
-const parseBullets = t => (t||"").split("\n").map(l=>l.trim().replace(/^[-•▸◆*]\s*/,"")).filter(Boolean);
+const parseBullets = t => (t || "").split("\n").map(l => l.trim().replace(/^[-•▸◆*]\s*/, "")).filter(Boolean);
 const fmtM = m => {
   if (!m) return "";
-  const [dd,mo,yyyy] = m.split("-");
-  const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mo-1];
+  const [dd, mo, yyyy] = m.split("-");
+  const mon = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][+mo - 1];
   return mon ? `${dd} ${mon} ${yyyy}` : m;
 };
 
 /* ─── Collapsible Card ──────────────────────────── */
-function CollapsibleCard({ badge, title, sub, onRemove, children, defaultOpen=true }) {
+function CollapsibleCard({ badge, title, sub, onRemove, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="card" style={{paddingTop:"1.55rem"}}>
+    <div className="card" style={{ paddingTop: "1.55rem" }}>
       <div className="card-badge">{badge}</div>
-      <div className="card-header" onClick={()=>setOpen(o=>!o)}>
-        <span className="card-header-title">{title||"Untitled"}</span>
+      <div className="card-header" onClick={() => setOpen(o => !o)}>
+        <span className="card-header-title">{title || "Untitled"}</span>
         {sub && <span className="card-header-sub">{sub}</span>}
-        <button className="card-del" onClick={e=>{e.stopPropagation();onRemove();}}>Remove</button>
-        <button className={`card-collapse-btn${open?" open":""}`} onClick={e=>{e.stopPropagation();setOpen(o=>!o);}}>
+        <button className="card-del" onClick={e => { e.stopPropagation(); onRemove(); }}>Remove</button>
+        <button className={`card-collapse-btn${open ? " open" : ""}`} onClick={e => { e.stopPropagation(); setOpen(o => !o); }}>
           <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
-            <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
       </div>
-      <div className={`card-collapsible${open?" open":" closed"}`}>
+      <div className={`card-collapsible${open ? " open" : " closed"}`}>
         <div className="card-body">{children}</div>
       </div>
     </div>
@@ -998,18 +998,18 @@ function CollapsibleCard({ badge, title, sub, onRemove, children, defaultOpen=tr
 /* ─── Tag Input ─────────────────────────────────── */
 function TagInput({ value, onChange }) {
   const [v, setV] = useState("");
-  const add = () => { const t=v.trim(); if(t && !value.includes(t)) onChange([...value,t]); setV(""); };
+  const add = () => { const t = v.trim(); if (t && !value.includes(t)) onChange([...value, t]); setV(""); };
   return (
-    <div className="tags" onClick={e=>e.currentTarget.querySelector("input").focus()}>
-      {value.map(t=>(
+    <div className="tags" onClick={e => e.currentTarget.querySelector("input").focus()}>
+      {value.map(t => (
         <span key={t} className="tag">{t}
-          <span className="tag-x" onClick={()=>onChange(value.filter(x=>x!==t))}>×</span>
+          <span className="tag-x" onClick={() => onChange(value.filter(x => x !== t))}>×</span>
         </span>
       ))}
       <input className="tag-inp" value={v}
-        placeholder={value.length===0 ? "Type a skill, press Enter" : "+ add more"}
-        onChange={e=>setV(e.target.value)}
-        onKeyDown={e=>{if(e.key==="Enter"||e.key===","){e.preventDefault();add();}}}
+        placeholder={value.length === 0 ? "Type a skill, press Enter" : "+ add more"}
+        onChange={e => setV(e.target.value)}
+        onKeyDown={e => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); } }}
         onBlur={add}
       />
     </div>
@@ -1017,7 +1017,7 @@ function TagInput({ value, onChange }) {
 }
 
 /* ─── AI Field ──────────────────────────────────── */
-function AiField({ label, value, onChange, placeholder, type="text", enhanceFn, required, validate }) {
+function AiField({ label, value, onChange, placeholder, type = "text", enhanceFn, required, validate }) {
   const [loading, setLoading] = useState(false);
   const [sugg, setSugg] = useState("");
   const [isValid, setIsValid] = useState(false);
@@ -1027,32 +1027,32 @@ function AiField({ label, value, onChange, placeholder, type="text", enhanceFn, 
     const v = e.target.value; onChange(v); setSugg("");
     if (validate) setIsValid(validate(v));
     clearTimeout(timerRef.current);
-    if (v.trim().length > 10) timerRef.current = setTimeout(()=>triggerEnhance(v), 2500);
+    if (v.trim().length > 10) timerRef.current = setTimeout(() => triggerEnhance(v), 2500);
   };
   const triggerEnhance = async v => {
     setLoading(true);
-    try { setSugg(await enhanceFn(v)); } catch {}
+    try { setSugg(await enhanceFn(v)); } catch { }
     finally { setLoading(false); }
   };
-  useEffect(()=>()=>clearTimeout(timerRef.current), []);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const showCheck = validate && isValid;
   return (
     <div className="f">
       {label && <label className="lbl">{label}{required && <span className="req"> *</span>}</label>}
-      <div className={`ai-field${showCheck?" field-valid-wrap":""}`}>
+      <div className={`ai-field${showCheck ? " field-valid-wrap" : ""}`}>
         <input className="inp" type={type} placeholder={placeholder} value={value} onChange={handleChange}
-          style={showCheck?{paddingRight:"5.5rem"}:{}}
+          style={showCheck ? { paddingRight: "5.5rem" } : {}}
         />
         {showCheck && (
           <div className="field-valid-icon show">
             <svg viewBox="0 0 10 10" fill="none" width="8" height="8">
-              <path d="M2 5l2 2 4-4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 5l2 2 4-4" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
         )}
-        <button className="ai-btn" disabled={loading||!value.trim()} onClick={()=>triggerEnhance(value)} title="Enhance with AI">
-          {loading ? <span className="ai-btn-spin"/> : "✦ AI"}
+        <button className="ai-btn" disabled={loading || !value.trim()} onClick={() => triggerEnhance(value)} title="Enhance with AI">
+          {loading ? <span className="ai-btn-spin" /> : "✦ AI"}
         </button>
       </div>
       {sugg && (
@@ -1060,8 +1060,8 @@ function AiField({ label, value, onChange, placeholder, type="text", enhanceFn, 
           <div className="ai-sugg-label">✦ AI Suggestion</div>
           <div className="ai-sugg-text">{sugg}</div>
           <div className="ai-sugg-actions">
-            <button className="ai-accept" onClick={()=>{onChange(sugg);setSugg("");}}>✓ Apply</button>
-            <button className="ai-dismiss" onClick={()=>setSugg("")}>✕ Dismiss</button>
+            <button className="ai-accept" onClick={() => { onChange(sugg); setSugg(""); }}>✓ Apply</button>
+            <button className="ai-dismiss" onClick={() => setSugg("")}>✕ Dismiss</button>
           </div>
         </div>
       )}
@@ -1071,7 +1071,7 @@ function AiField({ label, value, onChange, placeholder, type="text", enhanceFn, 
 }
 
 /* ─── AI TextArea ───────────────────────────────── */
-function AiTextArea({ label, value, onChange, placeholder, rows=4, enhanceFn, maxChars }) {
+function AiTextArea({ label, value, onChange, placeholder, rows = 4, enhanceFn, maxChars }) {
   const [loading, setLoading] = useState(false);
   const [sugg, setSugg] = useState("");
   const timerRef = useRef(null);
@@ -1079,14 +1079,14 @@ function AiTextArea({ label, value, onChange, placeholder, rows=4, enhanceFn, ma
   const handleChange = e => {
     const v = e.target.value; onChange(v); setSugg("");
     clearTimeout(timerRef.current);
-    if (v.trim().length > 20) timerRef.current = setTimeout(()=>triggerEnhance(v), 2500);
+    if (v.trim().length > 20) timerRef.current = setTimeout(() => triggerEnhance(v), 2500);
   };
   const triggerEnhance = async v => {
     setLoading(true);
-    try { setSugg(await enhanceFn(v)); } catch {}
+    try { setSugg(await enhanceFn(v)); } catch { }
     finally { setLoading(false); }
   };
-  useEffect(()=>()=>clearTimeout(timerRef.current), []);
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   const len = value.length;
   const charClass = maxChars ? (len > maxChars ? "over" : len > maxChars * 0.85 ? "warn" : "") : "";
@@ -1095,16 +1095,16 @@ function AiTextArea({ label, value, onChange, placeholder, rows=4, enhanceFn, ma
     <div className="f">
       {label && <label className="lbl">{label}</label>}
       <div className="ai-field">
-        <textarea className="txa" rows={rows} style={{paddingRight:"5.5rem"}}
+        <textarea className="txa" rows={rows} style={{ paddingRight: "5.5rem" }}
           placeholder={placeholder} value={value} onChange={handleChange}
         />
-        <button className="ai-btn" disabled={loading||!value.trim()} onClick={()=>triggerEnhance(value)} title="Enhance with AI">
-          {loading ? <span className="ai-btn-spin"/> : "✦ AI"}
+        <button className="ai-btn" disabled={loading || !value.trim()} onClick={() => triggerEnhance(value)} title="Enhance with AI">
+          {loading ? <span className="ai-btn-spin" /> : "✦ AI"}
         </button>
       </div>
       {maxChars && (
         <div className="char-counter-wrap">
-          <span className={`char-counter${charClass?" "+charClass:""}`}>{len} / {maxChars}</span>
+          <span className={`char-counter${charClass ? " " + charClass : ""}`}>{len} / {maxChars}</span>
         </div>
       )}
       {sugg && (
@@ -1112,8 +1112,8 @@ function AiTextArea({ label, value, onChange, placeholder, rows=4, enhanceFn, ma
           <div className="ai-sugg-label">✦ AI Suggestion</div>
           <div className="ai-sugg-text">{sugg}</div>
           <div className="ai-sugg-actions">
-            <button className="ai-accept" onClick={()=>{onChange(sugg);setSugg("");}}>✓ Apply</button>
-            <button className="ai-dismiss" onClick={()=>setSugg("")}>✕ Dismiss</button>
+            <button className="ai-accept" onClick={() => { onChange(sugg); setSugg(""); }}>✓ Apply</button>
+            <button className="ai-dismiss" onClick={() => setSugg("")}>✕ Dismiss</button>
           </div>
         </div>
       )}
@@ -1124,46 +1124,46 @@ function AiTextArea({ label, value, onChange, placeholder, rows=4, enhanceFn, ma
 
 /* ─── Month/Year Picker ─────────────────────────── */
 const MONTHS = [
-  {v:"01",l:"Jan",d:31},{v:"02",l:"Feb",d:28},{v:"03",l:"Mar",d:31},
-  {v:"04",l:"Apr",d:30},{v:"05",l:"May",d:31},{v:"06",l:"Jun",d:30},
-  {v:"07",l:"Jul",d:31},{v:"08",l:"Aug",d:31},{v:"09",l:"Sep",d:30},
-  {v:"10",l:"Oct",d:31},{v:"11",l:"Nov",d:30},{v:"12",l:"Dec",d:31},
+  { v: "01", l: "Jan", d: 31 }, { v: "02", l: "Feb", d: 28 }, { v: "03", l: "Mar", d: 31 },
+  { v: "04", l: "Apr", d: 30 }, { v: "05", l: "May", d: 31 }, { v: "06", l: "Jun", d: 30 },
+  { v: "07", l: "Jul", d: 31 }, { v: "08", l: "Aug", d: 31 }, { v: "09", l: "Sep", d: 30 },
+  { v: "10", l: "Oct", d: 31 }, { v: "11", l: "Nov", d: 30 }, { v: "12", l: "Dec", d: 31 },
 ];
-const YEARS = Array.from({length:new Date().getFullYear()-1999},(_,i)=>String(new Date().getFullYear()-i));
+const YEARS = Array.from({ length: new Date().getFullYear() - 1999 }, (_, i) => String(new Date().getFullYear() - i));
 
-function MonthYearPicker({ value, onChange, disabled=false }) {
-  const parts = value ? value.split("-") : ["","",""];
-  const [dd, setDd] = useState(parts[0]||"");
-  const [mm, setMm] = useState(parts[1]||"");
-  const [yyyy, setYyyy] = useState(parts[2]||"");
+function MonthYearPicker({ value, onChange, disabled = false }) {
+  const parts = value ? value.split("-") : ["", "", ""];
+  const [dd, setDd] = useState(parts[0] || "");
+  const [mm, setMm] = useState(parts[1] || "");
+  const [yyyy, setYyyy] = useState(parts[2] || "");
 
-  const daysInMonth = (month,year) => {
-    if(!month) return 31;
-    const found = MONTHS.find(m=>m.v===month);
-    if(!found) return 31;
-    if(month==="02"&&year){const y=parseInt(year);return(y%4===0&&(y%100!==0||y%400===0))?29:28;}
+  const daysInMonth = (month, year) => {
+    if (!month) return 31;
+    const found = MONTHS.find(m => m.v === month);
+    if (!found) return 31;
+    if (month === "02" && year) { const y = parseInt(year); return (y % 4 === 0 && (y % 100 !== 0 || y % 400 === 0)) ? 29 : 28; }
     return found.d;
   };
-  const days = Array.from({length:daysInMonth(mm,yyyy)},(_,i)=>String(i+1).padStart(2,"0"));
-  const emit = (ndd,nmm,nyyyy) => { if(ndd&&nmm&&nyyyy) onChange(`${ndd}-${nmm}-${nyyyy}`); };
+  const days = Array.from({ length: daysInMonth(mm, yyyy) }, (_, i) => String(i + 1).padStart(2, "0"));
+  const emit = (ndd, nmm, nyyyy) => { if (ndd && nmm && nyyyy) onChange(`${ndd}-${nmm}-${nyyyy}`); };
 
   const sel = w => ({
-    width:w, background:"var(--bg-input)", border:"1px solid var(--bd-input)", borderRadius:"6px",
-    color:"var(--tx-input)", fontSize:".7rem", padding:".3rem .25rem",
-    fontFamily:"DM Sans,sans-serif", cursor:disabled?"not-allowed":"pointer",
-    opacity:disabled?.35:1, outline:"none", appearance:"auto",
+    width: w, background: "var(--bg-input)", border: "1px solid var(--bd-input)", borderRadius: "6px",
+    color: "var(--tx-input)", fontSize: ".7rem", padding: ".3rem .25rem",
+    fontFamily: "DM Sans,sans-serif", cursor: disabled ? "not-allowed" : "pointer",
+    opacity: disabled ? .35 : 1, outline: "none", appearance: "auto",
   });
 
   return (
-    <div style={{display:"flex",gap:".3rem",alignItems:"center"}}>
-      <select style={sel("54px")} value={dd} disabled={disabled} onChange={e=>{setDd(e.target.value);emit(e.target.value,mm,yyyy);}}>
-        <option value="">DD</option>{days.map(d=><option key={d} value={d}>{d}</option>)}
+    <div style={{ display: "flex", gap: ".3rem", alignItems: "center" }}>
+      <select style={sel("54px")} value={dd} disabled={disabled} onChange={e => { setDd(e.target.value); emit(e.target.value, mm, yyyy); }}>
+        <option value="">DD</option>{days.map(d => <option key={d} value={d}>{d}</option>)}
       </select>
-      <select style={sel("60px")} value={mm} disabled={disabled} onChange={e=>{const nm=e.target.value;const mx=daysInMonth(nm,yyyy);const sd=dd&&parseInt(dd)>mx?"":dd;if(sd!==dd)setDd(sd);setMm(nm);emit(sd,nm,yyyy);}}>
-        <option value="">MM</option>{MONTHS.map(m=><option key={m.v} value={m.v}>{m.l}</option>)}
+      <select style={sel("60px")} value={mm} disabled={disabled} onChange={e => { const nm = e.target.value; const mx = daysInMonth(nm, yyyy); const sd = dd && parseInt(dd) > mx ? "" : dd; if (sd !== dd) setDd(sd); setMm(nm); emit(sd, nm, yyyy); }}>
+        <option value="">MM</option>{MONTHS.map(m => <option key={m.v} value={m.v}>{m.l}</option>)}
       </select>
-      <select style={sel("70px")} value={yyyy} disabled={disabled} onChange={e=>{setYyyy(e.target.value);emit(dd,mm,e.target.value);}}>
-        <option value="">YYYY</option>{YEARS.map(y=><option key={y} value={y}>{y}</option>)}
+      <select style={sel("70px")} value={yyyy} disabled={disabled} onChange={e => { setYyyy(e.target.value); emit(dd, mm, e.target.value); }}>
+        <option value="">YYYY</option>{YEARS.map(y => <option key={y} value={y}>{y}</option>)}
       </select>
     </div>
   );
@@ -1171,30 +1171,30 @@ function MonthYearPicker({ value, onChange, disabled=false }) {
 
 /* ─── Form Sections ─────────────────────────────── */
 function PersonalForm({ d, set }) {
-  const f = k => v => set({...d,[k]:v});
+  const f = k => v => set({ ...d, [k]: v });
   return (<>
     <div className="g2">
-      <AiField label="Full Name" required value={d.name} onChange={f("name")} placeholder="e.g. Priya Sharma" enhanceFn={v=>ENHANCERS.name(v)}
-        validate={v=>v.trim().length>1}
+      <AiField label="Full Name" required value={d.name} onChange={f("name")} placeholder="e.g. Priya Sharma" enhanceFn={v => ENHANCERS.name(v)}
+        validate={v => v.trim().length > 1}
       />
-      <AiField label="Job Title" value={d.title} onChange={f("title")} placeholder="e.g. Full Stack Developer" enhanceFn={v=>ENHANCERS.title(v)} />
+      <AiField label="Job Title" value={d.title} onChange={f("title")} placeholder="e.g. Full Stack Developer" enhanceFn={v => ENHANCERS.title(v)} />
     </div>
     <AiField label="Email" required value={d.email} onChange={f("email")} placeholder="you@gmail.com" type="email"
-      enhanceFn={v=>Promise.resolve(v)}
-      validate={v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)&&!/^[^@]+@(test|dummy|fake|example|mail|abc|xyz|temp)\./i.test(v)}
+      enhanceFn={v => Promise.resolve(v)}
+      validate={v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v) && !/^[^@]+@(test|dummy|fake|example|mail|abc|xyz|temp)\./i.test(v)}
     />
-    <AiField label="Phone" value={d.phone} onChange={v=>set({...d,phone:v.replace(/[^\d\s\+\-]/g,"")})} placeholder="+91 98765 43210"
-      enhanceFn={v=>Promise.resolve(v)}
-      validate={v=>v.replace(/\D/g,"").length>=10}
+    <AiField label="Phone" value={d.phone} onChange={v => set({ ...d, phone: v.replace(/[^\d\s\+\-]/g, "") })} placeholder="+91 98765 43210"
+      enhanceFn={v => Promise.resolve(v)}
+      validate={v => v.replace(/\D/g, "").length >= 10}
     />
-    <AiField label="Location" value={d.location} onChange={f("location")} placeholder="Bengaluru, Karnataka" enhanceFn={v=>ENHANCERS.location(v)} />
+    <AiField label="Location" value={d.location} onChange={f("location")} placeholder="Bengaluru, Karnataka" enhanceFn={v => ENHANCERS.location(v)} />
     <div className="g2">
-      <AiField label="LinkedIn" value={d.linkedin} onChange={f("linkedin")} placeholder="linkedin.com/in/username" enhanceFn={v=>ENHANCERS.linkedin(v)} />
-      <AiField label="GitHub"   value={d.github}   onChange={f("github")}   placeholder="github.com/username"   enhanceFn={v=>ENHANCERS.github(v)} />
+      <AiField label="LinkedIn" value={d.linkedin} onChange={f("linkedin")} placeholder="linkedin.com/in/username" enhanceFn={v => ENHANCERS.linkedin(v)} />
+      <AiField label="GitHub" value={d.github} onChange={f("github")} placeholder="github.com/username" enhanceFn={v => ENHANCERS.github(v)} />
     </div>
     <div className="f">
       <label className="lbl">Portfolio / Website</label>
-      <input className="inp" placeholder="yoursite.dev" value={d.website} onChange={e=>set({...d,website:e.target.value})} />
+      <input className="inp" placeholder="yoursite.dev" value={d.website} onChange={e => set({ ...d, website: e.target.value })} />
     </div>
   </>);
 }
@@ -1204,98 +1204,98 @@ function SummaryForm({ d, set, personalData }) {
     <div className="tip"><b>Tip —</b> Write a rough summary. AI will refine it automatically after you stop typing.</div>
     <AiTextArea
       label="Professional Summary"
-      value={d.text} onChange={v=>set({text:v})} rows={7}
+      value={d.text} onChange={v => set({ text: v })} rows={7}
       placeholder="e.g. Full-stack developer with 2 years in React and Node.js..."
-      enhanceFn={v=>ENHANCERS.summary(v, personalData)}
+      enhanceFn={v => ENHANCERS.summary(v, personalData)}
       maxChars={600}
     />
   </>);
 }
 
 function ExperienceForm({ d, set }) {
-  const upd = (id,k,v) => set(d.map(e=>e.id===id?{...e,[k]:v}:e));
+  const upd = (id, k, v) => set(d.map(e => e.id === id ? { ...e, [k]: v } : e));
   if (!d.length) return (
     <>
       <div className="empty-state">
         <div className="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{color:"var(--accent)"}}>
-            <path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 9H7v-2h8v2zm3-4H7V9h11v2z"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ color: "var(--accent)" }}>
+            <path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-5 9H7v-2h8v2zm3-4H7V9h11v2z" />
           </svg>
         </div>
         <h4>No experience added yet</h4>
         <p>Add internships, part-time roles, or full-time positions.</p>
       </div>
-      <button className="add-btn" onClick={()=>set([...d,newExp()])}>＋ Add Experience</button>
+      <button className="add-btn" onClick={() => set([...d, newExp()])}>＋ Add Experience</button>
     </>
   );
   return (<>
     <div className="tip"><b>Tip —</b> AI auto-suggests stronger bullet points as you type. Click a card header to collapse it.</div>
-    {d.map((e,i)=>(
-      <CollapsibleCard key={e.id} badge={`#${i+1}`}
-        title={e.role||e.company||"New Experience"}
-        sub={e.company&&e.role ? e.company : null}
-        onRemove={()=>set(d.filter(x=>x.id!==e.id))}
-        defaultOpen={i===d.length-1}
+    {d.map((e, i) => (
+      <CollapsibleCard key={e.id} badge={`#${i + 1}`}
+        title={e.role || e.company || "New Experience"}
+        sub={e.company && e.role ? e.company : null}
+        onRemove={() => set(d.filter(x => x.id !== e.id))}
+        defaultOpen={i === d.length - 1}
       >
         <div className="g2">
-          <AiField label="Company" value={e.company} onChange={v=>upd(e.id,"company",v)} placeholder="e.g. Infosys" enhanceFn={v=>ENHANCERS.company(v)} />
-          <AiField label="Role / Title" value={e.role} onChange={v=>upd(e.id,"role",v)} placeholder="e.g. Backend Developer" enhanceFn={v=>ENHANCERS.role(v,{company:e.company})} />
+          <AiField label="Company" value={e.company} onChange={v => upd(e.id, "company", v)} placeholder="e.g. Infosys" enhanceFn={v => ENHANCERS.company(v)} />
+          <AiField label="Role / Title" value={e.role} onChange={v => upd(e.id, "role", v)} placeholder="e.g. Backend Developer" enhanceFn={v => ENHANCERS.role(v, { company: e.company })} />
         </div>
         <div className="g2">
-          <div className="f"><label className="lbl">Start Date</label><MonthYearPicker value={e.start} onChange={v=>upd(e.id,"start",v)} /></div>
-          <div className="f"><label className="lbl">End Date</label><MonthYearPicker value={e.end} onChange={v=>upd(e.id,"end",v)} disabled={e.current} /></div>
+          <div className="f"><label className="lbl">Start Date</label><MonthYearPicker value={e.start} onChange={v => upd(e.id, "start", v)} /></div>
+          <div className="f"><label className="lbl">End Date</label><MonthYearPicker value={e.end} onChange={v => upd(e.id, "end", v)} disabled={e.current} /></div>
         </div>
         <div className="ck">
-          <input type="checkbox" id={`cur-${e.id}`} checked={e.current} onChange={x=>upd(e.id,"current",x.target.checked)} />
+          <input type="checkbox" id={`cur-${e.id}`} checked={e.current} onChange={x => upd(e.id, "current", x.target.checked)} />
           <label htmlFor={`cur-${e.id}`}>Currently working here</label>
         </div>
-        <AiTextArea label="Responsibilities & Achievements" value={e.bullets} onChange={v=>upd(e.id,"bullets",v)} rows={4}
+        <AiTextArea label="Responsibilities & Achievements" value={e.bullets} onChange={v => upd(e.id, "bullets", v)} rows={4}
           placeholder={"- Built REST APIs in Node.js\n- Led a team of 4 developers\n- Reduced page load time by 40%"}
-          enhanceFn={v=>ENHANCERS.bullets(v,{role:e.role,company:e.company})}
+          enhanceFn={v => ENHANCERS.bullets(v, { role: e.role, company: e.company })}
         />
       </CollapsibleCard>
     ))}
-    <button className="add-btn" onClick={()=>set([...d,newExp()])}>＋ Add Experience</button>
+    <button className="add-btn" onClick={() => set([...d, newExp()])}>＋ Add Experience</button>
   </>);
 }
 
 function EducationForm({ d, set }) {
-  const upd = (id,k,v) => set(d.map(e=>e.id===id?{...e,[k]:v}:e));
+  const upd = (id, k, v) => set(d.map(e => e.id === id ? { ...e, [k]: v } : e));
   if (!d.length) return (
     <>
       <div className="empty-state">
         <div className="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{color:"var(--accent)"}}>
-            <path d="M12 3L1 9l11 6 9-4.9V17h2V9L12 3zm-1 12.99L5 13l6 3.49 6-3.49-6 3.49z"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ color: "var(--accent)" }}>
+            <path d="M12 3L1 9l11 6 9-4.9V17h2V9L12 3zm-1 12.99L5 13l6 3.49 6-3.49-6 3.49z" />
           </svg>
         </div>
         <h4>No education added yet</h4>
         <p>Add your degrees, diplomas, or academic qualifications.</p>
       </div>
-      <button className="add-btn" onClick={()=>set([...d,newEdu()])}>＋ Add Education</button>
+      <button className="add-btn" onClick={() => set([...d, newEdu()])}>＋ Add Education</button>
     </>
   );
   return (<>
-    {d.map((e,i)=>(
-      <CollapsibleCard key={e.id} badge={`#${i+1}`}
-        title={e.degree ? `${e.degree}${e.field?` in ${e.field}`:""}` : (e.institution||"New Education")}
-        sub={e.institution||null}
-        onRemove={()=>set(d.filter(x=>x.id!==e.id))}
-        defaultOpen={i===d.length-1}
+    {d.map((e, i) => (
+      <CollapsibleCard key={e.id} badge={`#${i + 1}`}
+        title={e.degree ? `${e.degree}${e.field ? ` in ${e.field}` : ""}` : (e.institution || "New Education")}
+        sub={e.institution || null}
+        onRemove={() => set(d.filter(x => x.id !== e.id))}
+        defaultOpen={i === d.length - 1}
       >
-        <AiField label="Institution" value={e.institution} onChange={v=>upd(e.id,"institution",v)} placeholder="e.g. VTU / BITS Pilani" enhanceFn={v=>ENHANCERS.institution(v)} />
+        <AiField label="Institution" value={e.institution} onChange={v => upd(e.id, "institution", v)} placeholder="e.g. VTU / BITS Pilani" enhanceFn={v => ENHANCERS.institution(v)} />
         <div className="g2">
-          <AiField label="Degree" value={e.degree} onChange={v=>upd(e.id,"degree",v)} placeholder="B.E. / B.Tech / MCA" enhanceFn={v=>ENHANCERS.degree(v)} />
-          <AiField label="Field of Study" value={e.field} onChange={v=>upd(e.id,"field",v)} placeholder="Computer Science" enhanceFn={v=>ENHANCERS.field(v)} />
+          <AiField label="Degree" value={e.degree} onChange={v => upd(e.id, "degree", v)} placeholder="B.E. / B.Tech / MCA" enhanceFn={v => ENHANCERS.degree(v)} />
+          <AiField label="Field of Study" value={e.field} onChange={v => upd(e.id, "field", v)} placeholder="Computer Science" enhanceFn={v => ENHANCERS.field(v)} />
         </div>
         <div className="g3">
-          <div className="f"><label className="lbl">Start Year</label><input className="inp" placeholder="2020" value={e.start} onChange={x=>upd(e.id,"start",x.target.value)} /></div>
-          <div className="f"><label className="lbl">End Year</label><input className="inp" placeholder="2024" value={e.end} onChange={x=>upd(e.id,"end",x.target.value)} /></div>
-          <div className="f"><label className="lbl">CGPA / %</label><input className="inp" placeholder="8.5 / 85%" value={e.gpa} onChange={x=>upd(e.id,"gpa",x.target.value)} /></div>
+          <div className="f"><label className="lbl">Start Year</label><input className="inp" placeholder="2020" value={e.start} onChange={x => upd(e.id, "start", x.target.value)} /></div>
+          <div className="f"><label className="lbl">End Year</label><input className="inp" placeholder="2024" value={e.end} onChange={x => upd(e.id, "end", x.target.value)} /></div>
+          <div className="f"><label className="lbl">CGPA / %</label><input className="inp" placeholder="8.5 / 85%" value={e.gpa} onChange={x => upd(e.id, "gpa", x.target.value)} /></div>
         </div>
       </CollapsibleCard>
     ))}
-    <button className="add-btn" onClick={()=>set([...d,newEdu()])}>＋ Add Education</button>
+    <button className="add-btn" onClick={() => set([...d, newEdu()])}>＋ Add Education</button>
   </>);
 }
 
@@ -1303,125 +1303,125 @@ function SkillsForm({ d, set, personalData }) {
   const [loading, setLoading] = useState(false);
   const [sugg, setSugg] = useState([]);
   const enhance = async () => {
-    if(!d.length) return; setLoading(true);
-    try { const res=await ENHANCERS.skills(d,personalData); setSugg(res.split(",").map(s=>s.trim()).filter(Boolean)); }
-    catch {} finally { setLoading(false); }
+    if (!d.length) return; setLoading(true);
+    try { const res = await ENHANCERS.skills(d, personalData); setSugg(res.split(",").map(s => s.trim()).filter(Boolean)); }
+    catch { } finally { setLoading(false); }
   };
   return (<>
     <div className="tip"><b>ATS Tip —</b> Use exact keywords from job descriptions to pass automated screening.</div>
     <div className="f">
-      <label className="lbl">Skills <span style={{fontSize:".6rem",fontWeight:400,textTransform:"none",letterSpacing:0,color:"var(--tx-muted)"}}>— press Enter after each</span></label>
-      <TagInput value={d} onChange={v=>{set(v);setSugg([]);}} />
+      <label className="lbl">Skills <span style={{ fontSize: ".6rem", fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "var(--tx-muted)" }}>— press Enter after each</span></label>
+      <TagInput value={d} onChange={v => { set(v); setSugg([]); }} />
     </div>
-    {d.length===0 && (
-      <div className="empty-state" style={{padding:"1rem 0 0"}}>
+    {d.length === 0 && (
+      <div className="empty-state" style={{ padding: "1rem 0 0" }}>
         <p>Type a skill like React, Python, Figma and press Enter to add it.</p>
       </div>
     )}
-    <button className="ai-btn" style={{position:"static",width:"100%",justifyContent:"center",padding:".42rem",marginBottom:".4rem",borderRadius:"7px"}}
-      onClick={enhance} disabled={loading||!d.length}>
-      {loading ? <><span className="ai-btn-spin"/>Enhancing…</> : "✦ Enhance Skills with AI"}
+    <button className="ai-btn" style={{ position: "static", width: "100%", justifyContent: "center", padding: ".42rem", marginBottom: ".4rem", borderRadius: "7px" }}
+      onClick={enhance} disabled={loading || !d.length}>
+      {loading ? <><span className="ai-btn-spin" />Enhancing…</> : "✦ Enhance Skills with AI"}
     </button>
-    {sugg.length>0&&(
+    {sugg.length > 0 && (
       <div className="ai-suggestion-box">
         <div className="ai-sugg-label">✦ AI Suggestion</div>
         <div className="ai-sugg-text">{sugg.join(", ")}</div>
         <div className="ai-sugg-actions">
-          <button className="ai-accept" onClick={()=>{set(sugg);setSugg([]);}}>✓ Apply All</button>
-          <button className="ai-dismiss" onClick={()=>setSugg([])}>✕ Dismiss</button>
+          <button className="ai-accept" onClick={() => { set(sugg); setSugg([]); }}>✓ Apply All</button>
+          <button className="ai-dismiss" onClick={() => setSugg([])}>✕ Dismiss</button>
         </div>
       </div>
     )}
-    <div className="tip" style={{marginTop:".4rem"}}><b>Cover:</b> Languages · Frameworks · Databases · DevOps · Cloud · Tools · Soft Skills</div>
+    <div className="tip" style={{ marginTop: ".4rem" }}><b>Cover:</b> Languages · Frameworks · Databases · DevOps · Cloud · Tools · Soft Skills</div>
   </>);
 }
 
 function ProjectsForm({ d, set }) {
-  const upd = (id,k,v) => set(d.map(p=>p.id===id?{...p,[k]:v}:p));
+  const upd = (id, k, v) => set(d.map(p => p.id === id ? { ...p, [k]: v } : p));
   if (!d.length) return (
     <>
       <div className="empty-state">
         <div className="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{color:"var(--accent)"}}>
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ color: "var(--accent)" }}>
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z" />
           </svg>
         </div>
         <h4>No projects added yet</h4>
         <p>Showcase personal projects, open source work, or academic builds.</p>
       </div>
-      <button className="add-btn" onClick={()=>set([...d,newProj()])}>＋ Add Project</button>
+      <button className="add-btn" onClick={() => set([...d, newProj()])}>＋ Add Project</button>
     </>
   );
   return (<>
     <div className="tip"><b>Tip —</b> AI improves your project descriptions automatically as you type.</div>
-    {d.map((p,i)=>(
-      <CollapsibleCard key={p.id} badge={`#${i+1}`}
-        title={p.name||"New Project"}
-        sub={p.tech||null}
-        onRemove={()=>set(d.filter(x=>x.id!==p.id))}
-        defaultOpen={i===d.length-1}
+    {d.map((p, i) => (
+      <CollapsibleCard key={p.id} badge={`#${i + 1}`}
+        title={p.name || "New Project"}
+        sub={p.tech || null}
+        onRemove={() => set(d.filter(x => x.id !== p.id))}
+        defaultOpen={i === d.length - 1}
       >
-        <AiField label="Project Name" value={p.name} onChange={v=>upd(p.id,"name",v)} placeholder="e.g. Smart Resume Platform" enhanceFn={v=>ENHANCERS.projectName(v)} />
+        <AiField label="Project Name" value={p.name} onChange={v => upd(p.id, "name", v)} placeholder="e.g. Smart Resume Platform" enhanceFn={v => ENHANCERS.projectName(v)} />
         <div className="g2">
-          <AiField label="Tech Stack" value={p.tech} onChange={v=>upd(p.id,"tech",v)} placeholder="React, Node.js, MongoDB" enhanceFn={v=>ENHANCERS.tech(v)} />
-          <div className="f"><label className="lbl">GitHub / Live URL</label><input className="inp" placeholder="github.com/user/repo" value={p.url} onChange={e=>upd(p.id,"url",e.target.value)} /></div>
+          <AiField label="Tech Stack" value={p.tech} onChange={v => upd(p.id, "tech", v)} placeholder="React, Node.js, MongoDB" enhanceFn={v => ENHANCERS.tech(v)} />
+          <div className="f"><label className="lbl">GitHub / Live URL</label><input className="inp" placeholder="github.com/user/repo" value={p.url} onChange={e => upd(p.id, "url", e.target.value)} /></div>
         </div>
-        <AiTextArea label="Description" value={p.bullets} onChange={v=>upd(p.id,"bullets",v)} rows={3}
+        <AiTextArea label="Description" value={p.bullets} onChange={v => upd(p.id, "bullets", v)} rows={3}
           placeholder={"- What problem did it solve?\n- How did you build it?\n- What was the outcome?"}
-          enhanceFn={v=>ENHANCERS.projectBullets(v,{name:p.name,tech:p.tech})}
+          enhanceFn={v => ENHANCERS.projectBullets(v, { name: p.name, tech: p.tech })}
         />
       </CollapsibleCard>
     ))}
-    <button className="add-btn" onClick={()=>set([...d,newProj()])}>＋ Add Project</button>
+    <button className="add-btn" onClick={() => set([...d, newProj()])}>＋ Add Project</button>
   </>);
 }
 
 function CertificationsForm({ d, set }) {
-  const upd = (id,k,v) => set(d.map(c=>c.id===id?{...c,[k]:v}:c));
+  const upd = (id, k, v) => set(d.map(c => c.id === id ? { ...c, [k]: v } : c));
   if (!d.length) return (
     <>
       <div className="empty-state">
         <div className="empty-state-icon">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{color:"var(--accent)"}}>
-            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20" style={{ color: "var(--accent)" }}>
+            <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z" />
           </svg>
         </div>
         <h4>No certifications yet</h4>
         <p>Add AWS, Google Cloud, or any professional certifications you hold.</p>
       </div>
-      <button className="add-btn" onClick={()=>set([...d,newCert()])}>＋ Add Certification</button>
+      <button className="add-btn" onClick={() => set([...d, newCert()])}>＋ Add Certification</button>
     </>
   );
   return (<>
-    {d.map((c,i)=>(
-      <CollapsibleCard key={c.id} badge={`#${i+1}`}
-        title={c.name||"New Certification"}
-        sub={c.issuer||null}
-        onRemove={()=>set(d.filter(x=>x.id!==c.id))}
-        defaultOpen={i===d.length-1}
+    {d.map((c, i) => (
+      <CollapsibleCard key={c.id} badge={`#${i + 1}`}
+        title={c.name || "New Certification"}
+        sub={c.issuer || null}
+        onRemove={() => set(d.filter(x => x.id !== c.id))}
+        defaultOpen={i === d.length - 1}
       >
-        <AiField label="Certification Name" value={c.name} onChange={v=>upd(c.id,"name",v)} placeholder="e.g. AWS Solutions Architect" enhanceFn={v=>ENHANCERS.certName(v)} />
+        <AiField label="Certification Name" value={c.name} onChange={v => upd(c.id, "name", v)} placeholder="e.g. AWS Solutions Architect" enhanceFn={v => ENHANCERS.certName(v)} />
         <div className="g2">
-          <AiField label="Issued By" value={c.issuer} onChange={v=>upd(c.id,"issuer",v)} placeholder="e.g. Amazon Web Services" enhanceFn={v=>ENHANCERS.certIssuer(v)} />
-          <div className="f"><label className="lbl">Date</label><MonthYearPicker value={c.date} onChange={v=>upd(c.id,"date",v)} /></div>
+          <AiField label="Issued By" value={c.issuer} onChange={v => upd(c.id, "issuer", v)} placeholder="e.g. Amazon Web Services" enhanceFn={v => ENHANCERS.certIssuer(v)} />
+          <div className="f"><label className="lbl">Date</label><MonthYearPicker value={c.date} onChange={v => upd(c.id, "date", v)} /></div>
         </div>
       </CollapsibleCard>
     ))}
-    <button className="add-btn" onClick={()=>set([...d,newCert()])}>＋ Add Certification</button>
+    <button className="add-btn" onClick={() => set([...d, newCert()])}>＋ Add Certification</button>
   </>);
 }
 
 /* ─── Resume Preview ────────────────────────────── */
 function ResumePreview({ data }) {
-  const { personal:p, summary:s, experience, education, skills, projects, certifications } = data;
-  const hasContent = p.name||s.text||experience.length||education.length||skills.length;
+  const { personal: p, summary: s, experience, education, skills, projects, certifications } = data;
+  const hasContent = p.name || s.text || experience.length || education.length || skills.length;
   const contacts = [
-    p.email    && { label:p.email,    href:`mailto:${p.email}` },
-    p.phone    && { label:p.phone,    href:null },
-    p.location && { label:p.location, href:null },
-    p.linkedin && { label:p.linkedin, href:`https://${p.linkedin}` },
-    p.github   && { label:p.github,   href:`https://${p.github}` },
-    p.website  && { label:p.website,  href:`https://${p.website}` },
+    p.email && { label: p.email, href: `mailto:${p.email}` },
+    p.phone && { label: p.phone, href: null },
+    p.location && { label: p.location, href: null },
+    p.linkedin && { label: p.linkedin, href: `https://${p.linkedin}` },
+    p.github && { label: p.github, href: `https://${p.github}` },
+    p.website && { label: p.website, href: `https://${p.website}` },
   ].filter(Boolean);
 
   if (!hasContent) return (
@@ -1438,56 +1438,56 @@ function ResumePreview({ data }) {
     <div className="rv" id="resume-output">
       <div className="rv-name">{p.name || "Your Name"}</div>
       {p.title && <div className="rv-job">{p.title}</div>}
-      {contacts.length>0 && (
+      {contacts.length > 0 && (
         <div className="rv-contacts">
-          {contacts.map((c,i)=>c.href
+          {contacts.map((c, i) => c.href
             ? <a key={i} className="rv-c" href={c.href} target="_blank" rel="noreferrer">{c.label}</a>
             : <span key={i} className="rv-c">{c.label}</span>
           )}
         </div>
       )}
-      <div className="rv-hr"/>
+      <div className="rv-hr" />
       {s.text && <div className="rv-sec"><div className="rv-sh">Professional Summary</div><p className="rv-summary">{s.text}</p></div>}
-      {experience.length>0 && <div className="rv-sec"><div className="rv-sh">Work Experience</div>
-        {experience.map(e=>(
+      {experience.length > 0 && <div className="rv-sec"><div className="rv-sh">Work Experience</div>
+        {experience.map(e => (
           <div className="rv-entry" key={e.id}>
             <div className="rv-erow">
-              <div><div className="rv-etitle">{e.role||"Role"}</div><div className="rv-eorg">{e.company}</div></div>
-              <div className="rv-edate">{fmtM(e.start)}{e.start?" — ":""}{e.current?"Present":fmtM(e.end)}</div>
+              <div><div className="rv-etitle">{e.role || "Role"}</div><div className="rv-eorg">{e.company}</div></div>
+              <div className="rv-edate">{fmtM(e.start)}{e.start ? " — " : ""}{e.current ? "Present" : fmtM(e.end)}</div>
             </div>
-            {e.bullets && <ul className="rv-bul">{parseBullets(e.bullets).map((b,i)=><li key={i}>{b}</li>)}</ul>}
+            {e.bullets && <ul className="rv-bul">{parseBullets(e.bullets).map((b, i) => <li key={i}>{b}</li>)}</ul>}
           </div>
         ))}
       </div>}
-      {projects.length>0 && <div className="rv-sec"><div className="rv-sh">Projects</div>
-        {projects.map(proj=>(
+      {projects.length > 0 && <div className="rv-sec"><div className="rv-sh">Projects</div>
+        {projects.map(proj => (
           <div className="rv-entry" key={proj.id}>
             <div className="rv-erow">
-              <div><div className="rv-etitle">{proj.name||"Project"}</div>{proj.tech&&<div className="rv-esub">{proj.tech}</div>}</div>
-              {proj.url && <a className="rv-edate" style={{color:"#A07830",textDecoration:"none"}} href={`https://${proj.url}`} target="_blank" rel="noreferrer">{proj.url}</a>}
+              <div><div className="rv-etitle">{proj.name || "Project"}</div>{proj.tech && <div className="rv-esub">{proj.tech}</div>}</div>
+              {proj.url && <a className="rv-edate" style={{ color: "#A07830", textDecoration: "none" }} href={`https://${proj.url}`} target="_blank" rel="noreferrer">{proj.url}</a>}
             </div>
-            {proj.bullets && <ul className="rv-bul">{parseBullets(proj.bullets).map((b,i)=><li key={i}>{b}</li>)}</ul>}
+            {proj.bullets && <ul className="rv-bul">{parseBullets(proj.bullets).map((b, i) => <li key={i}>{b}</li>)}</ul>}
           </div>
         ))}
       </div>}
-      {education.length>0 && <div className="rv-sec"><div className="rv-sh">Education</div>
-        {education.map(e=>(
+      {education.length > 0 && <div className="rv-sec"><div className="rv-sh">Education</div>
+        {education.map(e => (
           <div className="rv-entry" key={e.id}>
             <div className="rv-erow">
-              <div><div className="rv-etitle">{[e.degree,e.field].filter(Boolean).join(" in ")||"Degree"}</div><div className="rv-eorg">{e.institution}</div></div>
-              <div className="rv-edate">{e.start}{e.start&&e.end?" – ":""}{e.end}</div>
+              <div><div className="rv-etitle">{[e.degree, e.field].filter(Boolean).join(" in ") || "Degree"}</div><div className="rv-eorg">{e.institution}</div></div>
+              <div className="rv-edate">{e.start}{e.start && e.end ? " – " : ""}{e.end}</div>
             </div>
-            {e.gpa && <div className="rv-esub" style={{marginTop:".06rem"}}>CGPA / Score: {e.gpa}</div>}
+            {e.gpa && <div className="rv-esub" style={{ marginTop: ".06rem" }}>CGPA / Score: {e.gpa}</div>}
           </div>
         ))}
       </div>}
-      {skills.length>0 && <div className="rv-sec"><div className="rv-sh">Skills</div>
-        <div className="rv-skills">{skills.map(sk=><span key={sk} className="rv-sk">{sk}</span>)}</div>
+      {skills.length > 0 && <div className="rv-sec"><div className="rv-sh">Skills</div>
+        <div className="rv-skills">{skills.map(sk => <span key={sk} className="rv-sk">{sk}</span>)}</div>
       </div>}
-      {certifications.length>0 && <div className="rv-sec"><div className="rv-sh">Certifications</div>
-        {certifications.map(c=>(
+      {certifications.length > 0 && <div className="rv-sec"><div className="rv-sh">Certifications</div>
+        {certifications.map(c => (
           <div className="rv-cert" key={c.id}>
-            <div><div className="rv-cname">{c.name}</div>{c.issuer&&<div className="rv-corg">{c.issuer}</div>}</div>
+            <div><div className="rv-cname">{c.name}</div>{c.issuer && <div className="rv-corg">{c.issuer}</div>}</div>
             <div className="rv-cdate">{fmtM(c.date)}</div>
           </div>
         ))}
@@ -1503,8 +1503,8 @@ const sectionTotal = (stepIdx) => {
 };
 const sectionCount = (stepIdx, data) => {
   const p = data.personal;
-  switch(stepIdx) {
-    case 0: return [p.name,p.email,p.phone,p.location,p.linkedin||p.github,p.title].filter(Boolean).length;
+  switch (stepIdx) {
+    case 0: return [p.name, p.email, p.phone, p.location, p.linkedin || p.github, p.title].filter(Boolean).length;
     case 1: return data.summary.text.trim().length > 20 ? 1 : 0;
     case 2: return Math.min(data.experience.length, 3);
     case 3: return Math.min(data.education.length, 2);
@@ -1516,113 +1516,113 @@ const sectionCount = (stepIdx, data) => {
 };
 
 /* ─── Main App ──────────────────────────────────── */
-export default function ResumeBuilder({ templateId="classic", onBack }) {
+export default function ResumeBuilder({ templateId = "classic", onBack }) {
   const dark = true;
   const [step, setStep] = useState(0);
   const [visited, setVisited] = useState(new Set([0]));
-  const [data, setData] = useState(()=>{
-    try { const s=localStorage.getItem("etherx_resume"); return s?JSON.parse(s):INIT; }
+  const [data, setData] = useState(() => {
+    try { const s = localStorage.getItem("etherx_resume"); return s ? JSON.parse(s) : INIT; }
     catch { return INIT; }
   });
   const [sideOpen, setSideOpen] = useState(false);
   const [mobTab, setMobTab] = useState("form");
   const [exporting, setExporting] = useState(false);
-  const [banner, setBanner] = useState({show:false,type:"",msg:""});
-  const [exportModal, setExportModal] = useState({open:false,type:null});
+  const [banner, setBanner] = useState({ show: false, type: "", msg: "" });
+  const [exportModal, setExportModal] = useState({ open: false, type: null });
   const [zoom, setZoom] = useState(100);
   const [saveState, setSaveState] = useState("saved");
   const formBodyRef = useRef(null);
 
   // Auto-save with visual "Saving…" feedback
-  useEffect(()=>{
+  useEffect(() => {
     setSaveState("saving");
-    const t = setTimeout(()=>{
-      localStorage.setItem("etherx_resume",JSON.stringify(data));
+    const t = setTimeout(() => {
+      localStorage.setItem("etherx_resume", JSON.stringify(data));
       setSaveState("saved");
     }, 600);
-    return ()=>clearTimeout(t);
+    return () => clearTimeout(t);
   }, [data]);
 
   // Keyboard shortcuts: Ctrl/Cmd+→ next, Ctrl/Cmd+← back, Ctrl/Cmd+S open export
-  useEffect(()=>{
+  useEffect(() => {
     const handler = e => {
-      if((e.ctrlKey||e.metaKey)&&e.key==="ArrowRight"){ e.preventDefault(); setStep(s=>{ const n=Math.min(s+1,STEPS.length-1); setVisited(p=>new Set([...p,n])); setSideOpen(false); return n; }); }
-      if((e.ctrlKey||e.metaKey)&&e.key==="ArrowLeft"){  e.preventDefault(); setStep(s=>{ const n=Math.max(s-1,0); setVisited(p=>new Set([...p,n])); setSideOpen(false); return n; }); }
-      if((e.ctrlKey||e.metaKey)&&e.key==="s"){ e.preventDefault(); openExportModal("pdf"); }
+      if ((e.ctrlKey || e.metaKey) && e.key === "ArrowRight") { e.preventDefault(); setStep(s => { const n = Math.min(s + 1, STEPS.length - 1); setVisited(p => new Set([...p, n])); setSideOpen(false); return n; }); }
+      if ((e.ctrlKey || e.metaKey) && e.key === "ArrowLeft") { e.preventDefault(); setStep(s => { const n = Math.max(s - 1, 0); setVisited(p => new Set([...p, n])); setSideOpen(false); return n; }); }
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); openExportModal("pdf"); }
     };
-    window.addEventListener("keydown",handler);
-    return ()=>window.removeEventListener("keydown",handler);
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
   }, []);
 
   // Scroll form back to top on step change
-  useEffect(()=>{ if(formBodyRef.current) formBodyRef.current.scrollTop=0; }, [step]);
+  useEffect(() => { if (formBodyRef.current) formBodyRef.current.scrollTop = 0; }, [step]);
 
-  const go = n => { setStep(n); setVisited(p=>new Set([...p,n])); setSideOpen(false); };
-  const setter = k => v => setData(p=>({...p,[k]:v}));
+  const go = n => { setStep(n); setVisited(p => new Set([...p, n])); setSideOpen(false); };
+  const setter = k => v => setData(p => ({ ...p, [k]: v }));
 
-  const showBanner = (type,msg,ms=4000) => {
-    setBanner({show:true,type,msg});
-    setTimeout(()=>setBanner({show:false,type:"",msg:""}), ms);
+  const showBanner = (type, msg, ms = 4000) => {
+    setBanner({ show: true, type, msg });
+    setTimeout(() => setBanner({ show: false, type: "", msg: "" }), ms);
   };
 
   // Opens modal — actual export fires from modal buttons
   const openExportModal = (type) => {
-    if(!data.personal.name.trim()){ showBanner("error","Please fill in your name before exporting."); return; }
-    setExportModal({open:true,type});
+    if (!data.personal.name.trim()) { showBanner("error", "Please fill in your name before exporting."); return; }
+    setExportModal({ open: true, type });
   };
 
   const handleExport = async type => {
-    if(typeof window==="undefined"||typeof document==="undefined") return;
-    if(!data.personal.name.trim()){ showBanner("error","Please fill in your name before exporting."); return; }
+    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (!data.personal.name.trim()) { showBanner("error", "Please fill in your name before exporting."); return; }
     setExporting(true);
 
-    if(type==="pdf"){
+    if (type === "pdf") {
       try {
         let exportFn;
-        if(templateId==="classic")        { const m=await import("../templates/ClassicTemplate");   exportFn=m.exportClassicPDF; }
-        else if(templateId==="modern")    { const m=await import("../templates/ModernTemplate");    exportFn=m.exportToPDF; }
-        else if(templateId==="tech")      { const m=await import("../templates/TechTemplate");      exportFn=m.exportToPDF; }
-        else if(templateId==="executive") { const m=await import("../templates/ExecutiveTemplate"); exportFn=m.exportToPDF; }
-        else if(templateId==="etherx")    { const m=await import("../templates/EtherXTemplate");   exportFn=m.exportToPDF; }
-        else if(templateId==="student")   { const m=await import("../templates/StudentTemplate");   exportFn=m.exportToPDF; }
-        if(exportFn){ await exportFn(data); }
+        if (templateId === "classic") { const m = await import("../templates/ClassicTemplate"); exportFn = m.exportClassicPDF; }
+        else if (templateId === "modern") { const m = await import("../templates/ModernTemplate"); exportFn = m.exportToPDF; }
+        else if (templateId === "tech") { const m = await import("../templates/TechTemplate"); exportFn = m.exportToPDF; }
+        else if (templateId === "executive") { const m = await import("../templates/ExecutiveTemplate"); exportFn = m.exportToPDF; }
+        else if (templateId === "etherx") { const m = await import("../templates/EtherXTemplate"); exportFn = m.exportToPDF; }
+        else if (templateId === "student") { const m = await import("../templates/StudentTemplate"); exportFn = m.exportToPDF; }
+        if (exportFn) { await exportFn(data); }
         else throw new Error("Export function not found for this template.");
-        setExportModal({open:false,type:null});
-        showBanner("success","Download started! Check your Downloads folder.");
-      } catch(err) {
-        showBanner("error",err.message||"PDF export failed.");
+        setExportModal({ open: false, type: null });
+        showBanner("success", "Download started! Check your Downloads folder.");
+      } catch (err) {
+        showBanner("error", err.message || "PDF export failed.");
       } finally { setExporting(false); }
     } else {
       try {
-        const res = await fetch(`${API}/api/export/docx`,{
-          method:"POST", headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({...data,templateId}),
+        const res = await fetch(`${API}/api/export/docx`, {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...data, templateId }),
         });
-        if(!res.ok) throw new Error("Export failed — the export service is temporarily unavailable.");
-        const blob=await res.blob();
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a"); a.href=url;
-        a.download=`${(data.personal.name||"resume").replace(/\s+/g,"_")}_${templateId}_resume.docx`;
+        if (!res.ok) throw new Error("Export failed — the export service is temporarily unavailable.");
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href = url;
+        a.download = `${(data.personal.name || "resume").replace(/\s+/g, "_")}_${templateId}_resume.docx`;
         a.click(); URL.revokeObjectURL(url);
-        setExportModal({open:false,type:null});
-        showBanner("success","Download started! Check your Downloads folder.");
-      } catch(err) {
-        showBanner("error",err.message||"Export failed. Please try again later.");
+        setExportModal({ open: false, type: null });
+        showBanner("success", "Download started! Check your Downloads folder.");
+      } catch (err) {
+        showBanner("error", err.message || "Export failed. Please try again later.");
       } finally { setExporting(false); }
     }
   };
 
   const forms = [
-    <PersonalForm       d={data.personal}       set={setter("personal")} />,
-    <SummaryForm        d={data.summary}         set={setter("summary")} personalData={data.personal} />,
-    <ExperienceForm     d={data.experience}      set={setter("experience")} />,
-    <EducationForm      d={data.education}       set={setter("education")} />,
-    <SkillsForm         d={data.skills}          set={setter("skills")} personalData={data.personal} />,
-    <ProjectsForm       d={data.projects}        set={setter("projects")} />,
-    <CertificationsForm d={data.certifications}  set={setter("certifications")} />,
+    <PersonalForm d={data.personal} set={setter("personal")} />,
+    <SummaryForm d={data.summary} set={setter("summary")} personalData={data.personal} />,
+    <ExperienceForm d={data.experience} set={setter("experience")} />,
+    <EducationForm d={data.education} set={setter("education")} />,
+    <SkillsForm d={data.skills} set={setter("skills")} personalData={data.personal} />,
+    <ProjectsForm d={data.projects} set={setter("projects")} />,
+    <CertificationsForm d={data.certifications} set={setter("certifications")} />,
   ];
 
-  const [t1,...rest] = STEPS[step].label.split(" ");
+  const [t1, ...rest] = STEPS[step].label.split(" ");
   const t2 = rest.join(" ");
 
   return (
@@ -1632,16 +1632,16 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
 
         {/* ── HEADER ── */}
         <header className="rb-hdr">
-          <button className="rb-hamburger" onClick={()=>setSideOpen(o=>!o)} aria-label="Menu">
+          <button className="rb-hamburger" onClick={() => setSideOpen(o => !o)} aria-label="Menu">
             <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-              <rect x="2" y="4" width="16" height="1.8" rx="1"/><rect x="2" y="9.1" width="16" height="1.8" rx="1"/><rect x="2" y="14.2" width="16" height="1.8" rx="1"/>
+              <rect x="2" y="4" width="16" height="1.8" rx="1" /><rect x="2" y="9.1" width="16" height="1.8" rx="1" /><rect x="2" y="14.2" width="16" height="1.8" rx="1" />
             </svg>
           </button>
 
           {onBack && (
             <button className="rb-back-btn" onClick={onBack} title="Back to Templates">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
-                <path d="M19 12H5M11 6l-6 6 6 6"/>
+                <path d="M19 12H5M11 6l-6 6 6 6" />
               </svg>
               Templates
             </button>
@@ -1653,30 +1653,30 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
             <div className="rb-logo-sub">Resume Intelligence</div>
           </div>
 
-          <div className="rb-pipe"/>
+          <div className="rb-pipe" />
           <span className="rb-badge">ATS-Optimized</span>
           <span className="rb-tmpl-chip">{templateId}</span>
 
           <div className="rb-hright">
             <div className="rb-save-state">
-              <span className={`rb-save-dot${saveState==="saving"?" saving":""}`}/>
-              {saveState==="saving" ? "Saving…" : "Saved"}
+              <span className={`rb-save-dot${saveState === "saving" ? " saving" : ""}`} />
+              {saveState === "saving" ? "Saving…" : "Saved"}
             </div>
             <div className="rb-step-counter">
-              <strong>Step {step+1}</strong>
+              <strong>Step {step + 1}</strong>
               <span>of {STEPS.length}</span>
               <div className="rb-step-dots">
-                {STEPS.map((_,i)=>(
-                  <span key={i} className={`rb-step-dot${i===step?" active":i<step?" done":""}`}/>
+                {STEPS.map((_, i) => (
+                  <span key={i} className={`rb-step-dot${i === step ? " active" : i < step ? " done" : ""}`} />
                 ))}
               </div>
             </div>
             <button className="rb-icon-btn"
-              onClick={()=>{if(window.confirm("Clear all data and start fresh?")){ localStorage.removeItem("etherx_resume"); setData(INIT); setStep(0); setVisited(new Set([0])); }}}
+              onClick={() => { if (window.confirm("Clear all data and start fresh?")) { localStorage.removeItem("etherx_resume"); setData(INIT); setStep(0); setVisited(new Set([0])); } }}
               title="Start Fresh"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
-                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
               </svg>
             </button>
           </div>
@@ -1685,36 +1685,36 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
         {/* ── BANNER ── */}
         {banner.show && (
           <div className={`rb-banner ${banner.type}`}>
-            {banner.type==="loading" && <span className="rb-spin"/>}
+            {banner.type === "loading" && <span className="rb-spin" />}
             <span>{banner.msg}</span>
           </div>
         )}
 
         {/* ── BODY ── */}
         <div className="rb-body">
-          {sideOpen && <div className="rb-overlay" onClick={()=>setSideOpen(false)}/>}
+          {sideOpen && <div className="rb-overlay" onClick={() => setSideOpen(false)} />}
 
           {/* SIDEBAR */}
-          <aside className={`rb-sidebar${sideOpen?" open":""}`}>
+          <aside className={`rb-sidebar${sideOpen ? " open" : ""}`}>
             <div className="rb-sidebar-ttl">Sections</div>
             <ul className="rb-nav">
-              {STEPS.map((s,i)=>{
+              {STEPS.map((s, i) => {
                 const count = sectionCount(i, data);
                 const total = sectionTotal(i);
-                const pct   = total > 0 ? Math.round((count/total)*100) : 0;
-                const circ  = 2 * Math.PI * 8;
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                const circ = 2 * Math.PI * 8;
                 const offset = circ - (circ * pct / 100);
-                const isActive = i===step;
-                const isDone   = visited.has(i) && !isActive;
+                const isActive = i === step;
+                const isDone = visited.has(i) && !isActive;
                 return (
                   <li key={s.key}
-                    className={`rb-ni${isActive?" active":""}${isDone?" done":""}`}
-                    onClick={()=>go(i)}
+                    className={`rb-ni${isActive ? " active" : ""}${isDone ? " done" : ""}`}
+                    onClick={() => go(i)}
                   >
                     <div className="rb-ni-ring">
                       {!isActive && (
                         <svg viewBox="0 0 20 20">
-                          <circle className="rb-ni-ring-bg" cx="10" cy="10" r="8"/>
+                          <circle className="rb-ni-ring-bg" cx="10" cy="10" r="8" />
                           <circle className="rb-ni-ring-fill" cx="10" cy="10" r="8"
                             strokeDasharray={circ}
                             strokeDashoffset={offset}
@@ -1722,15 +1722,15 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
                         </svg>
                       )}
                       <div className="rb-ni-ring-num">
-                        {isDone && count===total ? (
+                        {isDone && count === total ? (
                           <svg viewBox="0 0 12 12" fill="none" width="10" height="10">
-                            <path d="M2 6l3 3 5-5" stroke="#C9A84C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M2 6l3 3 5-5" stroke="#C9A84C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
-                        ) : (i+1)}
+                        ) : (i + 1)}
                       </div>
                     </div>
                     <span className="rb-ni-lbl">{s.label}</span>
-                    {[0,1].includes(i) && !isDone && !isActive && <span className="rb-ni-req" title="Required"/>}
+                    {[0, 1].includes(i) && !isDone && !isActive && <span className="rb-ni-req" title="Required" />}
                     {count > 0 && !isActive && (
                       <span className="rb-ni-count">{count}/{total}</span>
                     )}
@@ -1740,10 +1740,10 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
             </ul>
             <div className="rb-sidebar-export">
               <div className="rb-exp-label">Export Resume</div>
-              <button className="rb-exp-pdf" onClick={()=>openExportModal("pdf")} disabled={exporting}>
+              <button className="rb-exp-pdf" onClick={() => openExportModal("pdf")} disabled={exporting}>
                 {exporting ? "Generating…" : "↓ Download PDF"}
               </button>
-              <button className="rb-exp-doc" onClick={()=>openExportModal("docx")} disabled={exporting}>
+              <button className="rb-exp-doc" onClick={() => openExportModal("docx")} disabled={exporting}>
                 {exporting ? "Generating…" : "↓ Download Word"}
               </button>
             </div>
@@ -1753,30 +1753,30 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
           <div className="rb-form-wrap">
             <div className="rb-form-top">
               <div className="rb-sec-ttl">
-                <span className="rb-sec-ttl-icon"/>
+                <span className="rb-sec-ttl-icon" />
                 {t1}{t2 && <> <em>{t2}</em></>}
               </div>
               <div className="rb-sec-sub">{SUBS[step]}</div>
-              <div className="rb-rule"/>
+              <div className="rb-rule" />
             </div>
             <div className="rb-form-body" ref={formBodyRef} key={step}>{forms[step]}</div>
-            {step===STEPS.length-1 && <ATSPanel data={data} dark={dark}/>}
+            {step === STEPS.length - 1 && <ATSPanel data={data} dark={dark} />}
             <div className="rb-form-foot">
-              <div style={{display:"flex",flexDirection:"column",flex:1,gap:".35rem"}}>
-                <div style={{display:"flex",gap:".6rem"}}>
-                  {step>0 && <button className="btn-back" onClick={()=>go(step-1)}>← Back</button>}
-                  {step<STEPS.length-1
-                    ? <button className="btn-next" onClick={()=>go(step+1)}>Save &amp; Continue →</button>
-                    : <button className="btn-pdf" onClick={()=>openExportModal("pdf")} disabled={exporting}>
-                        {exporting ? "Generating…" : "↓ Download PDF"}
-                      </button>
+              <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: ".35rem" }}>
+                <div style={{ display: "flex", gap: ".6rem" }}>
+                  {step > 0 && <button className="btn-back" onClick={() => go(step - 1)}>← Back</button>}
+                  {step < STEPS.length - 1
+                    ? <button className="btn-next" onClick={() => go(step + 1)}>Save &amp; Continue →</button>
+                    : <button className="btn-pdf" onClick={() => openExportModal("pdf")} disabled={exporting}>
+                      {exporting ? "Generating…" : "↓ Download PDF"}
+                    </button>
                   }
                 </div>
                 <div className="rb-kbd-hint">
                   <span className="rb-kbd">⌘→</span> next
-                  <span style={{opacity:.35,margin:"0 .15rem"}}>·</span>
+                  <span style={{ opacity: .35, margin: "0 .15rem" }}>·</span>
                   <span className="rb-kbd">⌘←</span> back
-                  <span style={{opacity:.35,margin:"0 .15rem"}}>·</span>
+                  <span style={{ opacity: .35, margin: "0 .15rem" }}>·</span>
                   <span className="rb-kbd">⌘S</span> export
                 </div>
               </div>
@@ -1784,23 +1784,23 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
           </div>
 
           {/* PREVIEW */}
-          <div className={`rb-preview${mobTab==="preview"?" mob-show":""}`}>
+          <div className={`rb-preview${mobTab === "preview" ? " mob-show" : ""}`}>
             <div className="rb-prev-bar">
               <span className="rb-prev-ttl">Live Preview</span>
-              <span className="rb-live"><span className="rb-live-dot"/>Live</span>
+              <span className="rb-live"><span className="rb-live-dot" />Live</span>
               <div className="rb-exp-grp">
                 <div className="rb-zoom-grp">
-                  <button className="rb-zoom-btn" onClick={()=>setZoom(z=>Math.max(60,z-10))} title="Zoom out">−</button>
+                  <button className="rb-zoom-btn" onClick={() => setZoom(z => Math.max(60, z - 10))} title="Zoom out">−</button>
                   <span className="rb-zoom-val">{zoom}%</span>
-                  <button className="rb-zoom-btn" onClick={()=>setZoom(z=>Math.min(130,z+10))} title="Zoom in">+</button>
+                  <button className="rb-zoom-btn" onClick={() => setZoom(z => Math.min(130, z + 10))} title="Zoom in">+</button>
                 </div>
-                <button className="exp-btn ep-pdf" onClick={()=>openExportModal("pdf")} disabled={exporting}>↓ PDF</button>
-                <button className="exp-btn ep-doc" onClick={()=>openExportModal("docx")} disabled={exporting}>↓ Word</button>
+                <button className="exp-btn ep-pdf" onClick={() => openExportModal("pdf")} disabled={exporting}>↓ PDF</button>
+                <button className="exp-btn ep-doc" onClick={() => openExportModal("docx")} disabled={exporting}>↓ Word</button>
               </div>
             </div>
             <div className="rb-prev-scroll">
-              <div style={{transform:`scale(${zoom/100})`,transformOrigin:"top center",width:"100%",display:"flex",justifyContent:"center"}}>
-                <SelectedTemplate data={data} templateId={templateId}/>
+              <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top center", width: "100%", display: "flex", justifyContent: "center" }}>
+                <SelectedTemplate data={data} templateId={templateId} />
               </div>
             </div>
           </div>
@@ -1808,27 +1808,27 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
 
         {/* MOBILE TAB BAR */}
         <div className="rb-tabbar">
-          <button className={`rb-tab${mobTab==="form"?" active":""}`} onClick={()=>setMobTab("form")}>
+          <button className={`rb-tab${mobTab === "form" ? " active" : ""}`} onClick={() => setMobTab("form")}>
             <span className="rb-tab-ico">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z" /></svg>
             </span>
             <span className="rb-tab-lbl">Form</span>
           </button>
-          <button className={`rb-tab${mobTab==="preview"?" active":""}`} onClick={()=>setMobTab("preview")}>
+          <button className={`rb-tab${mobTab === "preview" ? " active" : ""}`} onClick={() => setMobTab("preview")}>
             <span className="rb-tab-ico">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" /></svg>
             </span>
             <span className="rb-tab-lbl">Preview</span>
           </button>
-          <button className="rb-tab" onClick={()=>openExportModal("pdf")} disabled={exporting}>
+          <button className="rb-tab" onClick={() => openExportModal("pdf")} disabled={exporting}>
             <span className="rb-tab-ico">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" /></svg>
             </span>
             <span className="rb-tab-lbl">PDF</span>
           </button>
-          <button className="rb-tab" onClick={()=>openExportModal("docx")} disabled={exporting}>
+          <button className="rb-tab" onClick={() => openExportModal("docx")} disabled={exporting}>
             <span className="rb-tab-ico">
-              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 16h8v2H8zm0-4h8v2H8zm0-4h4v2H8z"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 16h8v2H8zm0-4h8v2H8zm0-4h4v2H8z" /></svg>
             </span>
             <span className="rb-tab-lbl">Word</span>
           </button>
@@ -1836,22 +1836,22 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
 
         {/* ── EXPORT MODAL ── */}
         {exportModal.open && (
-          <div className="rb-modal-overlay" onClick={e=>{if(e.target===e.currentTarget)setExportModal({open:false,type:null});}}>
+          <div className="rb-modal-overlay" onClick={e => { if (e.target === e.currentTarget) setExportModal({ open: false, type: null }); }}>
             <div className="rb-modal">
               <div className="rb-modal-hdr">
                 <div className="rb-modal-title">
-                  <span className="rb-modal-title-dot"/>
+                  <span className="rb-modal-title-dot" />
                   Export Resume
                 </div>
-                <button className="rb-modal-close" onClick={()=>setExportModal({open:false,type:null})}>
-                  <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none"/></svg>
+                <button className="rb-modal-close" onClick={() => setExportModal({ open: false, type: null })}>
+                  <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" /></svg>
                 </button>
               </div>
               {exporting ? (
                 <div className="rb-modal-generating">
-                  <div className="rb-modal-gen-spinner"/>
-                  <div className="rb-modal-gen-label">Generating {exportModal.type==="pdf"?"PDF":"Word Doc"}…</div>
-                  <div className="rb-modal-gen-sub">Building your resume with the {templateId} template.<br/>This takes a few seconds.</div>
+                  <div className="rb-modal-gen-spinner" />
+                  <div className="rb-modal-gen-label">Generating {exportModal.type === "pdf" ? "PDF" : "Word Doc"}…</div>
+                  <div className="rb-modal-gen-sub">Building your resume with the {templateId} template.<br />This takes a few seconds.</div>
                 </div>
               ) : (
                 <>
@@ -1859,11 +1859,11 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
                     <div className="rb-modal-meta">
                       <div className="rb-modal-meta-row">
                         <span className="rb-modal-meta-label">Name</span>
-                        <span className="rb-modal-meta-value">{data.personal.name||"—"}</span>
+                        <span className="rb-modal-meta-value">{data.personal.name || "—"}</span>
                       </div>
                       <div className="rb-modal-meta-row">
                         <span className="rb-modal-meta-label">Template</span>
-                        <span className="rb-modal-meta-value" style={{textTransform:"capitalize"}}>{templateId}</span>
+                        <span className="rb-modal-meta-value" style={{ textTransform: "capitalize" }}>{templateId}</span>
                       </div>
                       <div className="rb-modal-meta-row">
                         <span className="rb-modal-meta-label">Sections filled</span>
@@ -1872,20 +1872,20 @@ export default function ResumeBuilder({ templateId="classic", onBack }) {
                     </div>
                     <div className="rb-modal-filename">
                       <span className="rb-modal-filename-icon">
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M4 4a2 2 0 012-2h5l5 5v9a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm7 0v4h4"/></svg>
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path d="M4 4a2 2 0 012-2h5l5 5v9a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm7 0v4h4" /></svg>
                       </span>
                       <span className="rb-modal-filename-text">
-                        {(data.personal.name||"resume").replace(/\s+/g,"_")}_{templateId}_resume.{exportModal.type==="pdf"?"pdf":"docx"}
+                        {(data.personal.name || "resume").replace(/\s+/g, "_")}_{templateId}_resume.{exportModal.type === "pdf" ? "pdf" : "docx"}
                       </span>
                     </div>
                   </div>
                   <div className="rb-modal-actions">
-                    <button className="rb-modal-btn-pdf" onClick={()=>handleExport("pdf")} disabled={exporting}>
-                      <svg viewBox="0 0 18 18" fill="currentColor" width="13" height="13"><path d="M3 13.5h12v1.5H3zm6.75-2.56l3.5-3.5-1.06-1.06-1.69 1.69V3h-1.5v5.07L8.31 6.38 7.25 7.44l3.5 3.5z"/></svg>
+                    <button className="rb-modal-btn-pdf" onClick={() => handleExport("pdf")} disabled={exporting}>
+                      <svg viewBox="0 0 18 18" fill="currentColor" width="13" height="13"><path d="M3 13.5h12v1.5H3zm6.75-2.56l3.5-3.5-1.06-1.06-1.69 1.69V3h-1.5v5.07L8.31 6.38 7.25 7.44l3.5 3.5z" /></svg>
                       Download PDF
                     </button>
-                    <button className="rb-modal-btn-doc" onClick={()=>handleExport("docx")} disabled={exporting}>
-                      <svg viewBox="0 0 18 18" fill="currentColor" width="13" height="13"><path d="M3 13.5h12v1.5H3zm6.75-2.56l3.5-3.5-1.06-1.06-1.69 1.69V3h-1.5v5.07L8.31 6.38 7.25 7.44l3.5 3.5z"/></svg>
+                    <button className="rb-modal-btn-doc" onClick={() => handleExport("docx")} disabled={exporting}>
+                      <svg viewBox="0 0 18 18" fill="currentColor" width="13" height="13"><path d="M3 13.5h12v1.5H3zm6.75-2.56l3.5-3.5-1.06-1.06-1.69 1.69V3h-1.5v5.07L8.31 6.38 7.25 7.44l3.5 3.5z" /></svg>
                       Download Word
                     </button>
                   </div>
